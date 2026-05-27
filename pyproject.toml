@@ -1,0 +1,32 @@
+[project]
+name = "game-data"
+version = "0.1.0"
+description = "Get and upload the game data to All The Ponies"
+readme = "README.md"
+authors = [
+    { name = "ego-lay_atman-bay", email = "ego-lay-atman-bay@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "argcomplete>=3.6.3",
+    "dataclasses-json>=0.6.7",
+    "luna-kit[all]",
+    "pillow>=12.2.0",
+    "requests>=2.34.2",
+    "rich>=15.0.0",
+]
+
+[project.scripts]
+game-data = "game_data:main"
+
+[build-system]
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.uv.sources]
+luna-kit = { git = "https://github.com/ego-lay-atman-bay/luna-kit/" }
+
+[dependency-groups]
+dev = [
+    "types-lxml>=2026.2.16",
+]
