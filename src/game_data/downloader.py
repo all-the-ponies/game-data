@@ -34,20 +34,20 @@ def download(output: str, version: str):
         except HTTPError:
             console.print(f'[red]Failed to download {file_info['filename']}[/]')
         
-        extras = ['000_and_startup_common.ark']
+    extras = ['000_and_startup_common.ark']
 
-        for filename in extras:
-            output_path = os.path.join(output, filename)
+    for filename in extras:
+        output_path = os.path.join(output, filename)
 
-            try:
-                console.print(f'Downloading [yellow]{filename}[/]')
-                with api.download_asset(
-                    filename,
-                    output_path,
-                    stream = True,
-                ) as downloader:
-                    downloader.response.raise_for_status()
-                    downloader.full_download(console)
-            except HTTPError:
-                console.print(f'[red]Failed to download {filename}[/]')
+        try:
+            console.print(f'Downloading [yellow]{filename}[/]')
+            with api.download_asset(
+                filename,
+                output_path,
+                stream = True,
+            ) as downloader:
+                downloader.response.raise_for_status()
+                downloader.full_download(console)
+        except HTTPError:
+            console.print(f'[red]Failed to download {filename}[/]')
 

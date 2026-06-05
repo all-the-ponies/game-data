@@ -10,6 +10,7 @@ import argcomplete
 from .console import console
 from .downloader import download
 from .extractor import extract
+from .transformer import Transformer
 
 
 def build_cdn(
@@ -34,10 +35,22 @@ def build_cdn(
     if not skip_download:
         console.print('Downloading files')
         download(arks_dir, version)
+        console.line()
 
-    console.line()
     console.print('Extracting files')
     extract(arks_dir, extracted_dir)
+
+    console.line()
+    console.print('Transforming data')
+    transformer = Transformer(
+        extracted_dir,
+        out_dir,
+        overrides_dir,
+        version,
+    )
+
+    transformer.start()
+    transformer.save()
 
     console.line()
     
@@ -77,7 +90,7 @@ def main() -> None:
     )
 
     build.add_argument(
-        '-r', '--overrides',
+        '--overrides',
         help = 'Path to overrides folder',
         default = 'overrides',
     )

@@ -1,5 +1,5 @@
 from rich.console import Console
-from rich.progress import Progress, ProgressType, ProgressColumn
+from rich.progress import Progress, ProgressType, ProgressColumn, TextColumn, BarColumn, MofNCompleteColumn, TimeRemainingColumn
 from typing import Union, Optional
 from collections.abc import Iterable, Sequence
 
@@ -14,7 +14,12 @@ def track(
     columns: list[str | ProgressColumn] | None = None,
 ):
     progress = Progress(
-        *(columns or ()),
+        *(columns or (
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            MofNCompleteColumn(),
+            TimeRemainingColumn(),
+        )),
         console = console,
         transient = transient,
     )
@@ -23,4 +28,5 @@ def track(
         yield from progress.track(
             sequence = sequence,
             description = description,
+            total = total,
         )
