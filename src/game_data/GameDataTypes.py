@@ -25,11 +25,6 @@ type Location = Literal[
 
 type Currency = Literal['Gems', 'Bits'] | GameObjectId
 
-type CategoryName = Literal[
-    'pony', 'house', 'shop', 'decor', 'item',
-    'token', 'avatar', 'frame', 'background_frame', 'background'
-]
-
 type TranslatableString = dict[Language, str]
 type AltName = dict[Language, list[str]]
 
@@ -60,8 +55,8 @@ class Price(DataClassJsonMixin):
 class GenericObjectType(DataClassJsonMixin):
     index: int
     id: str
-    name: TranslatableString
-    image: ImageBase
+    name: TranslatableString = field(default_factory = dict)
+    image: ImageBase = field(default_factory = dict)
     preferred_name: Optional[TranslatableString] = OptionalField()
     alt_name: Optional[AltName] = OptionalField()
     price: Optional[Price] = OptionalField()
@@ -98,7 +93,7 @@ class TaskData(DataClassJsonMixin):
 class PonyType(GenericObjectType):
     category: Literal['pony'] = 'pony'
     description: TranslatableString = field(default_factory = dict)
-    image: ImageBase[Literal['portrait']]
+    image: ImageBase[Literal['portrait']] = field(default_factory = dict)
     location: Location = 'UNKNOWN'
     house: Optional[str] = None
     inns: list[GameObjectId] = field(default_factory = list)
@@ -120,115 +115,130 @@ class PonyType(GenericObjectType):
 
 @dataclass
 class HouseBuild(DataClassJsonMixin):
-    time: int
-    skip_cost: int
-    xp: int
+    time: int = 0
+    skip_cost: int = 0
+    xp: int = 0
 
+@dataclass
 class HouseType(GenericObjectType):
-    category: Literal['house']
-    image: ImageBase
-    location: list[Location]
-    grid_size: int
-    build: HouseBuild
-    residents: list[str]
-    visitors: list[str]
-    wiki_path: str
+    category: Literal['house'] = 'house'
+    location: list[Location] = field(default_factory = list)
+    grid_size: int = 0
+    build: HouseBuild = field(default_factory = HouseBuild)
+    residents: list[str] = field(default_factory = list)
+    visitors: list[str] = field(default_factory = list)
+    wiki_path: str = ''
 
+@dataclass
 class ShopType(GenericObjectType):
-    category: Literal['shop']
-    image: ImageBase
-    grid_size: int
-    build: HouseBuild
-    residents: list[str]
-    visitors: list[str]
-    unlock_level: int
-    location: Location
-    product: ShopProduct
-    can_sell: bool
-    cost: Price
-    wiki_path: str
+    category: Literal['shop'] = 'shop'
+    grid_size: int = 0
+    build: HouseBuild = field(default_factory = HouseBuild)
+    residents: list[str] = field(default_factory = list)
+    visitors: list[str] = field(default_factory = list)
+    unlock_level: int = 0
+    location: Location = 'UNKNOWN'
+    product: GameObjectId = ''
+    special: Literal['lotto', 'ck_entrance', 'ferris_wheel'] | None = None
+    can_sell: bool = False
+    cost: Price = field(default_factory = Price)
+    wiki_path: str = ''
 
 @dataclass
 class DecorPro(DataClassJsonMixin):
-    is_pro: bool
-    size: int
-    time: int
-    bits: int
+    is_pro: bool = False
+    size: int = 0
+    time: int = 0
+    bits: int = 0
 
+@dataclass
 class DecorType(GenericObjectType):
-    category: Literal['decor']
-    image: ImageBase
-    location: Location
-    unlock_level: int
-    limit: int
-    grid_size: int
-    xp: int
-    cost: Price
-    fusion_points: int
-    pro: DecorPro
+    category: Literal['decor'] = 'decor'
+    location: Location = 'UNKNOWN'
+    unlock_level: int = 0
+    limit: int = 0
+    grid_size: int = 0
+    xp: int = 0
+    fusion_points: int = 0
+    pro: DecorPro = field(default_factory = DecorPro)
 
+@dataclass
 class ItemType(GenericObjectType):
-    category: Literal['item']
-    image: ImageBase
-    alt_ids: list[str]
+    category: Literal['item'] = 'item'
+    alt_ids: list[str] = field(default_factory = list)
 
+@dataclass
 class TokenType(GenericObjectType):
-    category: Literal['token']
-    image: ImageBase
-    chance: float
-    tasks: list[str]
-    unlimited: bool
-    no_reset: bool
+    category: Literal['token'] = 'token'
+    consumable: GameObjectId = ''
+    chance: float = 0
+    tasks: list[str] = field(default_factory = list)
+    unlimited: bool = False
+    no_reset: bool = False
+    special: int = 0
 
+@dataclass
 class AvatarType(GenericObjectType):
-    category: Literal['avatar']
-    image: ImageBase[Literal['preview']]
-    is_default: bool
-    pony: str
-    animated: bool
+    category: Literal['avatar'] = 'avatar'
+    image: ImageBase[Literal['preview']] = field(default_factory = dict)
+    is_default: bool = False
+    pony: str | None = None
+    animated: bool = False
 
+@dataclass
 class AvatarFrameType(GenericObjectType):
-    category: Literal['avatar_frame']
-    image: ImageBase[Literal['preview']]
-    is_default: bool
-    animated: bool
+    category: Literal['avatar_frame'] = 'avatar_frame'
+    image: ImageBase[Literal['preview']] = field(default_factory = dict)
+    is_default: bool = False
+    animated: bool = False
 
+@dataclass
 class BackgroundType(GenericObjectType):
-    category: Literal['background']
-    image: ImageBase[Literal['preview']]
-    is_default: bool
-    animated: bool
+    category: Literal['background'] = 'background'
+    image: ImageBase[Literal['preview']] = field(default_factory = dict)
+    is_default: bool = False
 
+@dataclass
 class BackgroundFrameType(GenericObjectType):
-    category: Literal['background_frame']
-    image: ImageBase[Literal['preview']]
-    is_default: bool
-    animated: bool
+    category: Literal['background_frame'] = 'background_frame'
+    image: ImageBase[Literal['preview']] = field(default_factory = dict)
+    is_default: bool = False
 
+@dataclass
+class CutieMarkType(GenericObjectType):
+    category: Literal['cutie_mark'] = 'cutie_mark'
+    pony: GameObjectId = ''
+    is_default: bool = False
+
+@dataclass
 class PetType(GenericObjectType):
-    category: Literal['pet']
-    pony: GameObjectId
-    flying: bool
-    task_bonus: int
-    minecart_bonus: int
+    category: Literal['pet'] = 'pet'
+    pony: GameObjectId = ''
+    flying: bool = False
+    task_bonus: int = 0
+    minecart_bonus: int = 0
 
+@dataclass
 class ThemeType(GenericObjectType):
-    category: Literal['theme']
-    location: Location
-    season: str
-    shop_bonus: int
-    quest: str
+    category: Literal['theme'] = 'theme'
+    location: Location = 'UNKNOWN'
+    season: str = ''
+    shop_bonus: int = 0
+    quest: str = ''
+    texture_suffix: str = ''
 
+@dataclass
 class PathType(GenericObjectType):
-    category: Literal['path']
-    location: Location
-    sprite: str
+    category: Literal['path'] = 'path'
+    location: Location = 'UNKNOWN'
+    sprite: str = ''
 
+@dataclass
 class BoosterType(GenericObjectType):
-    category: Literal['booster']
-    type: Literal['xp', 'bits']
-    time: int
-    multiplier: int
+    category: Literal['booster'] = 'booster'
+    type: Literal['xp', 'bits'] | None = None
+    time: int = 0
+    multiplier: int = 0
 
 @dataclass
 class FarmCost(DataClassJsonMixin):
@@ -246,56 +256,61 @@ class CritterUpgrade(DataClassJsonMixin):
 
 @dataclass
 class ConsumableCritter(DataClassJsonMixin):
+    critter: GameObjectId
     main_feed: GameObjectId
     additional_feed: GameObjectId
     phases: list[dict[Literal['main', 'additional'], int]]
     upgrade: CritterUpgrade
     final_cooldown: int
+    final_reward: dict[Literal['gems', 'xp'], int]
 
+@dataclass
 class ConsumableType(GenericObjectType):
-    category: Literal['consumable']
-    consume: dict[Literal['xp', 'bits', 'gems', 'hearts', 'wheels', 'blitz_energy', 'tls'], int]
+    category: Literal['consumable'] = 'consumable'
+    consume: dict[Literal['xp', 'bits', 'gems', 'hearts', 'wheels', 'blitz_energy', 'tls'], int] = field(default_factory = dict)
+    time: int = 0
+    skip_cost: int = 0
     farm: Optional[list[FarmCost]] = OptionalField()
     critter: Optional[ConsumableCritter] = OptionalField()
 
 @dataclass
 class CostumeBonus(DataClassJsonMixin):
-    type: Literal['MineCart', 'ShopProduction', 'MiniGames', '']
-    amount: int
+    type: Literal['MineCart', 'ShopProduction', 'MiniGames', ''] = ''
+    amount: int = 0
 
+@dataclass
 class CostumeType(GenericObjectType):
-    category: Literal['costume']
-    image: ImageBase[Literal['alt']]
-    enabled: bool
-    can_be_new: bool
-    is_subset: bool
-    is_only_alternate_mesh: bool
-    parts: dict[Literal['body', 'mane', 'tail'], GameObjectId | None]
-    bonus: CostumeBonus
-    tls_background: RenamedFile | None
-    sunsets: list[GameObjectId] | None
+    category: Literal['costume'] = 'costume'
+    image: ImageBase[Literal['alt']] = field(default_factory = dict)
+    enabled: bool = False
+    can_be_new: bool = False
+    is_subset: bool = False
+    is_only_alternate_mesh: bool = False
+    parts: dict[Literal['body', 'mane', 'tail'], GameObjectId | None] = field(default_factory = dict)
+    bonus: CostumeBonus = field(default_factory = CostumeBonus)
+    tls_background: RenamedFile | None = None
+    subsets: list[GameObjectId] = field(default_factory = list)
 
 @dataclass
 class CostumePartType(DataClassJsonMixin):
     index: int
-    category: Literal['costume_part']
-    image: ImageBase[Literal['alt']]
-    model_name: str
-    LinkedPart: GameObjectId | None
-    type: Literal['body', 'mane', 'tail']
-    apply_time: int
-    gem_price: int
-
-
-type GameObject = PonyType | HouseType | ShopType | DecorType | ItemType | TokenType | AvatarType | GenericObjectType
+    id: GameObjectId
+    category: Literal['costume_part'] = 'costume_part'
+    image: ImageBase[Literal['alt']] = field(default_factory = dict)
+    model_name: str = ''
+    linked_part: GameObjectId | None = None
+    type: Literal['body', 'mane', 'tail'] = 'body'
+    apply_time: int = 0
+    ingredients: list[int] = field(default_factory = list)
+    gem_price: int = 0
 
 
 @dataclass
 class QuestDetail(DataClassJsonMixin):
     name: TranslatableString
     description: TranslatableString
-    pro: list[str]
-    special: Literal['seasonal', 'tutorial'] | None
+    pro: list[str] = field(default_factory = list)
+    special: Literal['seasonal', 'tutorial'] | None = None
 
 @dataclass
 class GroupQuests(DataClassJsonMixin):
@@ -304,7 +319,7 @@ class GroupQuests(DataClassJsonMixin):
     quests: dict[str, QuestDetail] = field(default_factory = dict)
 
 
-type FortuneShopRarities = Literal['rare', 'common', 'uncommon']
+type FortuneShopRarities = Literal['common', 'uncommon', 'rare']
 type FortuneShopPrices = Literal['regular', 'discount', 'super', 'ultra']
 
 @dataclass
@@ -334,6 +349,48 @@ class CategoryData[T](DataClassJsonMixin):
     objects: dict[GameObjectId, T] = field(default_factory = dict)
 
 
+type CategoryName = Literal[
+    'pony',
+    'house',
+    'shop',
+    'decor',
+    'avatar',
+    'avatar_frame',
+    'background',
+    'background_frame',
+    'cutie_mark',
+    'pet',
+    'theme',
+    'path',
+    'item',
+    'booster',
+    'token',
+    'consumable',
+    'costume',
+    'costume_part',
+]
+
+CATEGORY_NAMES: list[CategoryName] = [
+    'pony',
+    'house',
+    'shop',
+    'decor',
+    'avatar',
+    'avatar_frame',
+    'background',
+    'background_frame',
+    'cutie_mark',
+    'pet',
+    'theme',
+    'path',
+    'item',
+    'booster',
+    'token',
+    'consumable',
+    'costume',
+    'costume_part',
+]
+
 @dataclass
 class GameObjects(DataClassJsonMixin):
     file_version: int = 1
@@ -345,6 +402,7 @@ class GameObjects(DataClassJsonMixin):
     avatar_frame: CategoryData[AvatarFrameType] = field(default_factory = CategoryData[AvatarFrameType])
     background: CategoryData[BackgroundType] = field(default_factory = CategoryData[BackgroundType])
     background_frame: CategoryData[BackgroundFrameType] = field(default_factory = CategoryData[BackgroundFrameType])
+    cutie_mark: CategoryData[CutieMarkType] = field(default_factory = CategoryData[CutieMarkType])
     pet: CategoryData[PetType] = field(default_factory = CategoryData[PetType])
     theme: CategoryData[ThemeType] = field(default_factory = CategoryData[ThemeType])
     path: CategoryData[PathType] = field(default_factory = CategoryData[PathType])
@@ -359,11 +417,3 @@ class GameObjects(DataClassJsonMixin):
 class GameVersion(DataClassJsonMixin):
     game_version: str = ''
     content_version: str = ''
-
-class GameDataType(TypedDict):
-    file_version: int
-    game_version: str
-    content_version: str
-    categories: GameObjects
-    group_quests: GroupQuests
-    fortune_shop: FortuneShop

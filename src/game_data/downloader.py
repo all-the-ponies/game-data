@@ -1,12 +1,14 @@
 import os
 from requests import HTTPError
+from pathlib import Path
 
 from luna_kit.api import API
 
 from .console import console
 
-def download(output: str, version: str):
-    os.makedirs(output, exist_ok = True)
+def download(output: str | Path, version: str):
+    output = Path(output)
+    output.mkdir(parents = True, exist_ok = True)
     
     api = API('android', version)
 
@@ -20,7 +22,7 @@ def download(output: str, version: str):
         if file_info['device_calibre'] not in ['all', 'veryhigh'] or not file_info['enabled']:
             continue
 
-        output_path = os.path.join(output, file_info['filename'])
+        output_path = output/file_info['filename']
         try:
             console.print(f'Downloading [yellow]{file_info['filename']}[/]')
             with api.download_asset(
@@ -37,7 +39,7 @@ def download(output: str, version: str):
     extras = ['000_and_startup_common.ark']
 
     for filename in extras:
-        output_path = os.path.join(output, filename)
+        output_path = output/filename
 
         try:
             console.print(f'Downloading [yellow]{filename}[/]')

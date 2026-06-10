@@ -1,0 +1,20 @@
+{
+  "pony": {
+    "Pony_Minty_G4": {
+      "preferred_name": {
+        "english": "Minty (G4)"
+      }
+    },
+    "Pony_Jonagold": {
+      "tags": ["unused"]
+    },
+    "Pony_Nightmare_Starlight_Glimmer_UPD98": {
+      "wiki_path": "Nightmare_Starlight_Glimmer_(10.7)"
+    },
+    "Pony_Tempest_Shadow": {
+      "alt_name": {
+          "english": ["Tempest Shadow"]
+      }
+    }
+  }
+}

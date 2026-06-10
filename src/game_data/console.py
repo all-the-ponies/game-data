@@ -6,6 +6,14 @@ from collections.abc import Iterable, Sequence
 console = Console(quiet = False)
 
 
+COLUMNS = (
+    TextColumn("[progress.description]{task.description}"),
+    BarColumn(),
+    MofNCompleteColumn(),
+    TimeRemainingColumn(),
+)
+
+
 def track(
     sequence: Union[Iterable[ProgressType], Sequence[ProgressType]],
     total: Optional[float] = None,
@@ -14,12 +22,7 @@ def track(
     columns: list[str | ProgressColumn] | None = None,
 ):
     progress = Progress(
-        *(columns or (
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            MofNCompleteColumn(),
-            TimeRemainingColumn(),
-        )),
+        *(columns or COLUMNS),
         console = console,
         transient = transient,
     )

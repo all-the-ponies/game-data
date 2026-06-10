@@ -21,8 +21,8 @@ def build_cdn(
     overrides_dir: str,
     skip_download: bool = False,
 ):
-    arks_dir = os.path.join(raw_dir, 'arks')
-    extracted_dir = os.path.join(raw_dir, 'extracted')
+    arks_dir = Path(raw_dir, 'arks')
+    extracted_dir = Path(raw_dir, 'extracted')
 
     if not skip_download:
         shutil.rmtree(arks_dir, ignore_errors = True)
