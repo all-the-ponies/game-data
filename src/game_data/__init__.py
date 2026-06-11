@@ -101,6 +101,8 @@ def build_cdn(
                 notifier.notify('content')
             
         console.print(f'[green]Found version {version}[/]')
+    else:
+        console.print(f'version: {version}')
         
 
 
