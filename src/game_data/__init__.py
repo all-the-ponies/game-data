@@ -11,7 +11,8 @@ from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 import google_play_scraper as gplay
 
-from luna_kit.api import API, DLCManifest
+from luna_kit.api import API
+from luna_kit.typings import DLCManifest
 
 from .console import console
 from .downloader import download
