@@ -11,6 +11,7 @@ dependencies = [
     "argcomplete>=3.6.3",
     "boto3>=1.43.26",
     "dataclasses-json>=0.6.7",
+    "google-play-scraper>=1.2.7",
     "luna-kit[all]",
     "pillow>=12.2.0",
     "requests>=2.34.2",

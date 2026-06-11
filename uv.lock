@@ -429,6 +429,7 @@ dependencies = [
     { name = "argcomplete" },
     { name = "boto3" },
     { name = "dataclasses-json" },
+    { name = "google-play-scraper" },
     { name = "luna-kit", extra = ["all"] },
     { name = "pillow" },
     { name = "requests" },
@@ -448,6 +449,7 @@ requires-dist = [
     { name = "argcomplete", specifier = ">=3.6.3" },
     { name = "boto3", specifier = ">=1.43.26" },
     { name = "dataclasses-json", specifier = ">=0.6.7" },
+    { name = "google-play-scraper", specifier = ">=1.2.7" },
     { name = "luna-kit", extras = ["all"], git = "https://github.com/ego-lay-atman-bay/luna-kit/" },
     { name = "pillow", specifier = ">=12.2.0" },
     { name = "requests", specifier = ">=2.34.2" },
@@ -460,6 +462,15 @@ dev = [
     { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "types-boto3-custom", path = "vendored/types_boto3_custom-1.43.26-py3-none-any.whl" },
     { name = "types-lxml", specifier = ">=2026.2.16" },
+]
+
+[[package]]
+name = "google-play-scraper"
+version = "1.2.7"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/db/29/3530af5fee212e7cdd31a5847ecb306c8202745f08dc608de10454a82499/google_play_scraper-1.2.7.tar.gz", hash = "sha256:284f321d1b2c39e39e97e490d51bc316e1d876802360efb7e7463b5c16ed4972", size = 41734, upload-time = "2024-06-07T01:03:11.325Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/33/f7/a23ef3cf8efc9ab3aee565971f59906811e6ce95475314ef7b18d02f30ba/google_play_scraper-1.2.7-py3-none-any.whl", hash = "sha256:a485510b09265f0096fc3813cfc26eef27e9a5c0035f99ee23f80e00de724530", size = 28988, upload-time = "2024-06-07T01:03:09.144Z" },
 ]
 
 [[package]]
