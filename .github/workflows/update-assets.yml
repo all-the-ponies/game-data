@@ -1,0 +1,57 @@
+name: Check for updates
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'App version to download'
+        required: false
+        default: 'latest'
+        type: string
+
+jobs:
+  run-task:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+
+    - name: Set up Java
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+
+    - name: Cache FFDec
+      id: cache-ffdec
+      uses: actions/cache@v5
+      with:
+        path: ffdec
+        key: ${{ runner.os }}-ffdec-v26.2.1
+
+    # 2. Download and unzip FFDec into /ffdec folder if not cached
+    - name: Download FFDec
+      if: steps:cache-ffdec.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p ffdec
+        curl -L -o ffdec.zip https://github.com/jindrapetrik/jpexs-decompiler/releases/download/version26.2.1/ffdec_26.2.1.zip
+        unzip ffdec.zip -d ffdec
+        rm ffdec.zip
+
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v8
+      with:
+        enable-cache: true
+
+    - name: Run Python command
+      env:
+        S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
+        S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+        S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+        S3_REGION: ${{ secrets.S3_REGION }}
+        NOTIFICATION_CONFIG: ${{ secrets.NOTIFICATION_CONFIG }}
+      run: uv run game-data build -v "${{ inputs.version || 'auto' }}" --upload
