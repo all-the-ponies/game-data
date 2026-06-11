@@ -55,4 +55,4 @@ jobs:
         S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
         S3_REGION: ${{ secrets.S3_REGION }}
         NOTIFICATION_CONFIG: ${{ secrets.NOTIFICATION_CONFIG }}
-      run: uv run game-data build -v "${{ inputs.version || 'auto' }}" --upload
+      run: uv run game-data build -v "${{ inputs.version || 'auto' }}" --upload --ffdec "ffdec/ffdec.jar"
