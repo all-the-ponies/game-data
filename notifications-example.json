@@ -1,0 +1,31 @@
+{
+  "discord": [
+    {
+      "name": "All The Ponies",
+      "webhook": "DISCORD_WEBHOOK",
+      "message": {
+        "app": {
+          "roles": [
+            "1514488029891264542"
+          ],
+          "title": "New game version available!",
+          "message": "My Little Pony: Magic Princess has a new app update!\n\n**Version:** {version}",
+          "fields": [
+            {
+              "name": "What's New",
+              "value": "{release_notes}",
+              "inline": false
+            }
+          ]
+        },
+        "content": {
+          "roles": [
+            "1514488029891264542"
+          ],
+          "title": "New content update available!",
+          "message": "My Little Pony: Magic Princess has a new content update! Open the game to download it."
+        }
+      }
+    }
+  ]
+}

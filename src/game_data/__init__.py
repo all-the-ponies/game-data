@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 
 import argcomplete
+from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 import google_play_scraper as gplay
 
@@ -15,6 +16,7 @@ from luna_kit.api import API, DLCManifest
 from .console import console
 from .downloader import download
 from .extractor import extract
+from .notify import Notifier
 from .s3 import BUCKET, get_s3_client
 from .sync import sync
 from .transformer import Transformer
@@ -44,6 +46,8 @@ def build_cdn(
     latest_dlc_manifest: DLCManifest | None = None
     s3_client = get_s3_client()
 
+    notifier = Notifier()
+
     if version == 'latest':
         last_version: str | None = None
         try:
@@ -59,11 +63,17 @@ def build_cdn(
             except:
                 console.print('Could not get current version')
         
-        latest_version = gplay.app(PACKAGE_NAME)['version']
+        app_info = gplay.app(PACKAGE_NAME)
+        latest_version = app_info['version']
+
+        notifier.version = latest_version
+        notifier.release_notes = app_info['recentChanges']
+        notifier.app_icon = app_info['icon']
 
         version = latest_version
         if not last_version or latest_version != last_version:
             console.print(f'New app version found: [yellow]{latest_version}[/]')
+            notifier.notify('app')
         else:
             api = API('android', last_version)
 
@@ -82,9 +92,11 @@ def build_cdn(
                     return
                 else:
                     console.print('New content update found!')
+                    notifier.notify('content')
 
-            except:
+            except ClientError:
                 console.print('Could not check dlc_manifest')
+                notifier.notify('content')
             
         console.print(f'[green]Found version {version}[/]')
         

@@ -165,4 +165,5 @@ cython_debug/
 ffdec/
 raw/*
 !raw/.gitkeep
-notification-config.json
+notifications.json
+notifications/
