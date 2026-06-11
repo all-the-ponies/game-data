@@ -14,6 +14,7 @@ on:
 
 jobs:
   run-task:
+    name: Check and download version
     runs-on: ubuntu-latest
 
     steps:
@@ -43,7 +44,7 @@ jobs:
         rm ffdec.zip
 
     - name: Set up uv
-      uses: astral-sh/setup-uv@v8
+      uses: astral-sh/setup-uv@v8.2.0
       with:
         enable-cache: true
 
