@@ -35,7 +35,7 @@ jobs:
 
     # 2. Download and unzip FFDec into /ffdec folder if not cached
     - name: Download FFDec
-      if: steps:cache-ffdec.outputs.cache-hit != 'true'
+      if: steps.cache-ffdec.outputs.cache-hit != 'true'
       run: |
         mkdir -p ffdec
         curl -L -o ffdec.zip https://github.com/jindrapetrik/jpexs-decompiler/releases/download/version26.2.1/ffdec_26.2.1.zip
