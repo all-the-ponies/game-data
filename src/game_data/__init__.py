@@ -2,16 +2,19 @@
 
 from argparse import ArgumentParser
 import os
-import shutil
 from pathlib import Path
+import shutil
 
 import argcomplete
+from dotenv import load_dotenv
 
 from .console import console
 from .downloader import download
 from .extractor import extract
+from .sync import sync
 from .transformer import Transformer
 
+load_dotenv()
 
 def build_cdn(
     raw_dir: str,
@@ -19,40 +22,50 @@ def build_cdn(
     version: str,
     upload: bool,
     overrides_dir: str,
-    skip_download: bool = False,
+    skip: list[str] | None = None,
 ):
+    if skip is None:
+        skip = []
+
     arks_dir = Path(raw_dir, 'arks')
     extracted_dir = Path(raw_dir, 'extracted')
 
-    if not skip_download:
+    if 'download' not in skip:
         shutil.rmtree(arks_dir, ignore_errors = True)
-    
-    shutil.rmtree(out_dir, ignore_errors = True)
-    shutil.rmtree(extracted_dir, ignore_errors = True)
+    if 'extract' not in skip:
+        shutil.rmtree(extracted_dir, ignore_errors = True)
+    if 'transform' not in skip:
+        shutil.rmtree(out_dir, ignore_errors = True)
 
     os.makedirs(out_dir, exist_ok = True)
     
-    if not skip_download:
+    if 'download' not in skip:
         console.print('Downloading files')
         download(arks_dir, version)
         console.line()
 
-    console.print('Extracting files')
-    extract(arks_dir, extracted_dir)
+    if 'extract' not in skip:
+        console.print('Extracting files')
+        extract(arks_dir, extracted_dir)
 
-    console.line()
-    console.print('Transforming data')
-    transformer = Transformer(
-        extracted_dir,
-        out_dir,
-        overrides_dir,
-        version,
-    )
+        console.line()
+    
+    if 'transform' not in skip:
+        console.print('Transforming data')
+        transformer = Transformer(
+            extracted_dir,
+            out_dir,
+            overrides_dir,
+            version,
+        )
 
-    transformer.start()
-    transformer.save()
+        transformer.start()
+        transformer.save()
 
-    console.line()
+        console.line()
+
+    if upload:
+        sync(dist_folder = out_dir)
     
 
 def main() -> None:
@@ -103,10 +116,12 @@ def main() -> None:
     )
 
     build.add_argument(
-        '--skip-download',
-        dest = 'skip_download',
-        help = 'Skip download',
-        action = 'store_true',
+        '--skip',
+        dest = 'skip',
+        nargs = '+',
+        choices = ['download', 'extract', 'transform'],
+        help = 'Skip action',
+        default = [],
     )
 
     argcomplete.autocomplete(argparser)
@@ -121,5 +136,5 @@ def main() -> None:
                 version = args.version,
                 upload = args.upload,
                 overrides_dir = args.overrides,
-                skip_download = args.skip_download,
+                skip = args.skip,
             )
