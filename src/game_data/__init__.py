@@ -34,6 +34,7 @@ def build_cdn(
     upload: bool,
     overrides_dir: str | Path,
     skip: list[str] | None = None,
+    ffdec: str = 'ffdec',
 ):
     if skip is None:
         skip = []
@@ -71,7 +72,7 @@ def build_cdn(
         notifier.app_icon = app_info['icon']
 
         version = latest_version
-        if True or not last_version or latest_version != last_version:
+        if not last_version or latest_version != last_version:
             console.print(f'New app version found: [yellow]{latest_version}[/]')
             notifier.notify('app')
         else:
@@ -129,6 +130,7 @@ def build_cdn(
             dist_dir,
             overrides_dir,
             version,
+            ffdec = ffdec,
         )
 
         transformer.start()
@@ -207,6 +209,13 @@ def main() -> None:
         default = [],
     )
 
+    build.add_argument(
+        '--ffdec',
+        dest = 'ffdec',
+        help = 'Path to ffdec.jar',
+        default = 'ffdec',
+    )
+
     argcomplete.autocomplete(argparser)
 
     args = argparser.parse_args()
@@ -220,4 +229,5 @@ def main() -> None:
                 upload = args.upload,
                 overrides_dir = args.overrides,
                 skip = args.skip,
+                ffdec = args.ffdec,
             )
