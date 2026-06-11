@@ -1,4 +1,6 @@
-from typing import TypedDict, Literal, NotRequired
+from typing import TypedDict, Literal, NotRequired, Any
+
+type UpdateType = Literal['app', 'content']
 
 class DiscordField(TypedDict):
     name: str
@@ -14,7 +16,16 @@ class DiscordMessage(TypedDict):
 class DiscordConfig(TypedDict):
     name: str
     webhook: str
-    message: dict[Literal['app', 'content'], DiscordMessage]
+    message: dict[UpdateType, DiscordMessage]
+
+class NtfyConfig(TypedDict):
+    name: str
+    token: NotRequired[str]
+    topic: str
+    message: dict[UpdateType, dict[str, Any]]
+
 
 class NotificationConfig(TypedDict):
     discord: NotRequired[list[DiscordConfig]]
+    ntfy: NotRequired[list[NtfyConfig]]
+

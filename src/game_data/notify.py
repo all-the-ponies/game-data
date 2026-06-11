@@ -7,7 +7,7 @@ import uuid
 import requests
 
 from .console import console
-from .notifyTypes import NotificationConfig
+from .notifyTypes import NotificationConfig, UpdateType
 
 
 class Notifier:
@@ -37,20 +37,74 @@ class Notifier:
         
         self.config = json.loads(raw_config)
     
-    def format_string(self, string: str):
-        return string.format(
-            version = self.version,
-            release_notes = self.release_notes,
-        )
+    def format_string[T: str | dict | list](self, string: T) -> T:
+        if isinstance(string, str):
+            return string.format(
+                version = self.version,
+                release_notes = self.release_notes,
+            ) # type: ignore
+        elif isinstance(string, dict):
+            new = {}
+            for key, value in string.items():
+                if isinstance(value, (str, dict, list)):
+                    value = self.format_string(value)
+                new[key] = value
+            return new # type: ignore
+        elif isinstance(string, list):
+            new = []
+            for value in string:
+                if isinstance(value, (str, dict, list)):
+                    value = self.format_string(value)
+                new.append(value)
+            return new # type: ignore
+        
+        return string
     
-    def notify(self, type: Literal['app', 'content']):
+    def notify(self, type: UpdateType):
         if not self.config:
             return
         
-        if 'discord' in self.config:
-            self.notify_discord(type)
+        self.notify_ntfy(type)
+        self.notify_discord(type)
+        
+    def notify_ntfy(self, type: UpdateType):
+        if not self.config:
+            return
+        
+        for ntfy_config in self.config.get('ntfy', []):
+            message_config = ntfy_config['message'].get(type)
+            if not message_config:
+                continue
+            
+            console.print(f'[yellow]ntfy {ntfy_config["name"]}[/]')
+            
+            body = {
+                'topic': ntfy_config['topic'],
+                **self.format_string(message_config),
+            }
+
+
+            headers = {
+                'Content-Type': 'application/json'
+            }
+            if 'token' in ntfy_config:
+                headers['Authorization'] = f'Bearer {ntfy_config["token"]}'
+
+            failed = False
+            try:
+                response = requests.post('https://ntfy.sh/', data = json.dumps(body).encode(), headers = headers)
+                failed = not response.ok
+            except requests.HTTPError as e:
+                failed = True
+                console.print(e)
+            
+            if failed:
+                console.print(body)
+                console.print(f'[red]Failed to send to {ntfy_config['name']} {response.content}[/]')
+
+            
     
-    def notify_discord(self, type: Literal['app', 'content']):
+    def notify_discord(self, type: UpdateType):
         if not self.config:
             return
         

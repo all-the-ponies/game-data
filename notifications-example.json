@@ -27,5 +27,24 @@
         }
       }
     }
+  ],
+  "ntfy": [
+    {
+      "name": "ntfy mobile push",
+      "token": "TOKEN (optional)",
+      "topic": "TOPIC",
+      "message": {
+        "app": {
+          "title": "All The Ponies",
+          "message": "MLP has updated to {version}",
+          "priority": 5
+        },
+        "content": {
+          "title": "All The Ponies",
+          "message": "MLP has a new content update",
+          "priority": 5
+        }
+      }
+    }
   ]
 }

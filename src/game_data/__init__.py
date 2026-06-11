@@ -71,7 +71,7 @@ def build_cdn(
         notifier.app_icon = app_info['icon']
 
         version = latest_version
-        if not last_version or latest_version != last_version:
+        if True or not last_version or latest_version != last_version:
             console.print(f'New app version found: [yellow]{latest_version}[/]')
             notifier.notify('app')
         else:
