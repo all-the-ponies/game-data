@@ -29,10 +29,10 @@ class Notifier:
     def get_notification_config(self):
         raw_config = os.environ.get('NOTIFICATION_CONFIG')
         if not raw_config:
-            if not os.path.exists('notifications.json'):
+            if not os.path.exists('notifications.dev.json'):
                 return
             
-            with open('notifications.json', 'r', encoding = 'utf-8') as file:
+            with open('notifications.dev.json', 'r', encoding = 'utf-8') as file:
                 raw_config = file.read()
         
         self.config = json.loads(raw_config)
@@ -110,7 +110,7 @@ class Notifier:
         
         for server in self.config.get('discord', []):
             message_config = server['message'].get(type)
-            if not message_config:
+            if not message_config or not server.get('webhook'):
                 continue
             
             console.print(f'Notifying [yellow]{server['name']}[/]')

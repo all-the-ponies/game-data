@@ -15,10 +15,10 @@ S3_SECRET_KEY=testing
 S3_REGION=us-east-1
 ```
 
-To use notifications, use `notifications-example.json` to create the notifications config. You can either place it in a `notifications.json` file, or a `NOTIFICATIONS_CONFIG` environment variable. The github action expects a ``NOTIFICATIONS_CONFIG` secret, so here's a quick command to put `notifications.json` into that secret.
+To use notifications, use `notifications-example.json` to create the notifications config. You can either place it in a `notifications.dev.json` file, or a `NOTIFICATIONS_CONFIG` environment variable. The github action expects a `NOTIFICATIONS_CONFIG` secret, so here's a quick command to put `notifications.prod.json` into that secret.
 
 ```shell
-jq -c < notifications.json | gh secret set NOTIFICATION_CONFIG
+jq -c < notifications.prod.json | gh secret set NOTIFICATION_CONFIG
 ```
 
 You need to get [ffdec](https://github.com/jindrapetrik/jpexs-decompiler/), and either add it to the path, or add `--ffdec ffdec.jar` to the command.
