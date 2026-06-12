@@ -7,6 +7,7 @@ import uuid
 import requests
 
 from .console import console
+from .env import is_dev
 from .notifyTypes import NotificationConfig, UpdateType
 
 
@@ -29,10 +30,11 @@ class Notifier:
     def get_notification_config(self):
         raw_config = os.environ.get('NOTIFICATION_CONFIG')
         if not raw_config:
-            if not os.path.exists('notifications.dev.json'):
+            config_file = 'notifications.dev.json' if is_dev() else 'notifications.json'
+            if not os.path.exists(config_file):
                 return
             
-            with open('notifications.dev.json', 'r', encoding = 'utf-8') as file:
+            with open(config_file, 'r', encoding = 'utf-8') as file:
                 raw_config = file.read()
         
         self.config = json.loads(raw_config)
@@ -100,7 +102,7 @@ class Notifier:
             
             if failed:
                 console.print(body)
-                console.print(f'[red]Failed to send to {ntfy_config['name']} {response.content}[/]')
+                console.print(f'[red]Failed to send to {ntfy_config['name']}[/]')
 
             
     

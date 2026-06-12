@@ -1,5 +1,7 @@
 # PYTHON_ARGCOMPLETE_OK
 
+import resource
+
 from argparse import ArgumentParser
 import json
 import os
@@ -8,22 +10,19 @@ import shutil
 
 import argcomplete
 from botocore.exceptions import ClientError
-from dotenv import load_dotenv
 import google_play_scraper as gplay
 
 from luna_kit.api import API
 from luna_kit.typings import DLCManifest
 
 from .console import console
+from .env import set_mode, load_env, GAME_DATA_ENV_VAR
 from .downloader import download
 from .extractor import extract
 from .notify import Notifier
 from .s3 import BUCKET, get_s3_client
 from .sync import sync
 from .transformer import Transformer
-
-load_dotenv()
-
 
 PACKAGE_NAME = "com.gameloft.android.ANMP.GloftPOHM"
 
@@ -159,6 +158,14 @@ def build_cdn(
 def main() -> None:
     argparser = ArgumentParser()
 
+    argparser.add_argument(
+        '--env',
+        dest = 'env',
+        choices = ['dev', 'prod'],
+        default = None,
+        help = f'The environment to use. Can be set with {GAME_DATA_ENV_VAR}. Note: this is more for loading .env and different notifications.json files in development.',
+    )
+
     command = argparser.add_subparsers(
         title = 'command',
         dest = 'command',
@@ -223,6 +230,10 @@ def main() -> None:
 
     args = argparser.parse_args()
 
+    if args.env:
+        set_mode(prod = args.env == 'prod')
+    load_env()
+
     match args.command:
         case 'build':
             build_cdn(
@@ -234,3 +245,6 @@ def main() -> None:
                 skip = args.skip,
                 ffdec = args.ffdec,
             )
+    
+    peak_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+    print(f"Peak Memory Usage: {peak_memory:.2f} MB")
