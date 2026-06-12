@@ -22,6 +22,6 @@ RUN mkdir -p /app/ffdec && \
     rm /tmp/ffdec.zip
 
 ENV PATH="/app/.venv/bin:$PATH"
-RUN uv sync --frozen
+RUN uv sync --frozen --no-dev
 
 CMD ["uv", "run", "game-data", "build", "-v", "latest", "--upload", "--ffdec", "ffdec/ffdec.jar"]
