@@ -558,7 +558,7 @@ class Transformer:
                 avatar_info = AvatarType(
                     index = index,
                     id = avatar.id,
-                    name = self.translate_string(avatar.get('Name', {}).get('Unlocal', avatar.id)),
+                    name = self.translate_string(avatar.get('Shop', {}).get('Label', avatar.id)),
                     image = {},
                 )
                 
@@ -611,7 +611,7 @@ class Transformer:
                 frame_info = AvatarFrameType(
                     index = index,
                     id = frame.id,
-                    name = self.translate_string(frame.get('Name', {}).get('Unlocal', frame.id)),
+                    name = self.translate_string(frame.get('Shop', {}).get('Label', frame.id)),
                     image = {},
                 )
                 
@@ -663,7 +663,7 @@ class Transformer:
                 background_info = BackgroundType(
                     index = index,
                     id = background.id,
-                    name = self.translate_string(background.get('Name', {}).get('Unlocal', background.id)),
+                    name = self.translate_string(background.get('Shop', {}).get('Label', background.id)),
                     image = {},
                 )
                 
@@ -709,7 +709,7 @@ class Transformer:
                 frame_info = BackgroundFrameType(
                     index = index,
                     id = frame.id,
-                    name = self.translate_string(frame.get('Name', {}).get('Unlocal', frame.id)),
+                    name = self.translate_string(frame.get('Shop', {}).get('Label', frame.id)),
                     image = {
                         'main': self.add_image(
                             [frame.get('Settings', {}).get('PictureActive', '')],
@@ -743,7 +743,7 @@ class Transformer:
                 cutie_mark_info = CutieMarkType(
                     index = index,
                     id = cutie_mark.id,
-                    name = self.translate_string(cutie_mark.get('Name', {}).get('Unlocal', cutie_mark.id)),
+                    name = self.translate_string(cutie_mark.get('Shop', {}).get('Label', cutie_mark.id)),
                     image = {
                         'main': self.add_image(
                             [cutie_mark.get('Settings', {}).get('PictureActive', '')],
