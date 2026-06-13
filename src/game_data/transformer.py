@@ -192,7 +192,7 @@ class Transformer:
             file.write(self.game_data.game_objects.to_json(ensure_ascii = False, indent = 2))
         with open(self.output_folder/'group_quests.json', 'w', encoding = 'utf-8') as file:
             file.write(self.game_data.group_quests.to_json(ensure_ascii = False, indent = 2))
-        with open(self.output_folder/'gortune_shop.json', 'w', encoding = 'utf-8') as file:
+        with open(self.output_folder/'fortune_shop.json', 'w', encoding = 'utf-8') as file:
             file.write(self.game_data.fortune_shop.to_json(ensure_ascii = False, indent = 2))
     
     def get_game_objects(self):
