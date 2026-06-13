@@ -45,11 +45,11 @@ def build_cdn(
     extracted_dir = raw_dir/'extracted'
 
     latest_dlc_manifest: DLCManifest | None = None
-    s3_client = get_s3_client()
+    s3_client = get_s3_client() if upload else None
 
     notifier = Notifier()
 
-    if version == 'latest':
+    if s3_client and version == 'latest':
         last_version: str | None = None
         try:
             version_file = s3_client.get_object(
@@ -140,7 +140,7 @@ def build_cdn(
 
         console.line()
 
-    if upload:
+    if upload and s3_client:
         sync(dist_folder = dist_dir)
         
         api = API('android', version)
