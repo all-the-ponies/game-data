@@ -615,7 +615,7 @@ wheels = [
 [[package]]
 name = "luna-kit"
 version = "1.1.0"
-source = { git = "https://github.com/ego-lay-atman-bay/luna-kit/#682f7cdf19fc5d2969024528cf7fe4556b86d0cb" }
+source = { git = "https://github.com/ego-lay-atman-bay/luna-kit/#9a61632f85b89070718fba9400440c1f87b64660" }
 
 [package.optional-dependencies]
 all = [
