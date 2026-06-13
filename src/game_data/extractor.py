@@ -1,6 +1,7 @@
 import os
 
 from luna_kit.ark import ARK
+from luna_kit.ark_filename import sort_ark_filenames
 from luna_kit.texatlas import TexAtlas
 
 from .console import console, track, COLUMNS
@@ -12,7 +13,13 @@ def extract(arks_dir: Path, output: Path):
     arks_dir = Path(arks_dir)
     output = Path(output)
 
-    for filename in os.listdir(arks_dir):
+    arks = os.listdir(arks_dir)
+    try:
+        sort_ark_filenames(arks)
+    except:
+        console.print('[red]Could not sort ark files[/]')
+
+    for filename in arks:
         with ARK(arks_dir/filename) as ark:
             console.print(f'Extracting [yellow]{filename}[/]')
 
