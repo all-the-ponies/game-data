@@ -111,7 +111,7 @@ class PonyType(GenericObjectType):
     tasks: list[str] = field(default_factory = list)
     pro: list[str] = field(default_factory = list)
     collections: list[str] = field(default_factory = list)
-    wiki_path: str | None = None
+    wiki_path: str = ''
 
 @dataclass
 class HouseBuild(DataClassJsonMixin):
@@ -182,7 +182,7 @@ class AvatarType(GenericObjectType):
     category: Literal['avatar'] = 'avatar'
     image: ImageBase[Literal['preview']] = field(default_factory = dict)
     is_default: bool = False
-    pony: str | None = None
+    pony: GameObjectId | None = None
     animated: bool = False
 
 @dataclass
@@ -201,7 +201,6 @@ class BackgroundType(GenericObjectType):
 @dataclass
 class BackgroundFrameType(GenericObjectType):
     category: Literal['background_frame'] = 'background_frame'
-    image: ImageBase[Literal['preview']] = field(default_factory = dict)
     is_default: bool = False
 
 @dataclass
@@ -335,7 +334,6 @@ class FortuneShopItem(DataClassJsonMixin):
 
 @dataclass
 class FortuneShop(DataClassJsonMixin):
-    file_version: int = 1
     max_items_in_shop: int = 6
     refresh_cost: int = 50
     item_rarity_chances: dict[FortuneShopRarities, float] = field(default_factory = dict)
@@ -392,7 +390,6 @@ CATEGORY_NAMES: list[CategoryName] = [
 
 @dataclass
 class GameObjects(DataClassJsonMixin):
-    file_version: int = 1
     pony: CategoryData[PonyType] = field(default_factory = CategoryData[PonyType])
     house: CategoryData[HouseType] = field(default_factory = CategoryData[HouseType])
     shop: CategoryData[ShopType] = field(default_factory = CategoryData[ShopType])
