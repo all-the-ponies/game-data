@@ -314,7 +314,6 @@ class QuestDetail(DataClassJsonMixin):
 
 @dataclass
 class GroupQuests(DataClassJsonMixin):
-    file_version: int = 1
     random_pros: list[str] = field(default_factory = list)
     quests: dict[str, QuestDetail] = field(default_factory = dict)
 
