@@ -302,7 +302,7 @@ class CostumePartType(DataClassJsonMixin):
     linked_part: GameObjectId | None = None
     type: Literal['body', 'mane', 'tail'] = 'body'
     apply_time: int = 0
-    ingredients: list[int] = field(default_factory = list)
+    materials: list[int] = field(default_factory = list)
     gem_price: int = 0
 
 

@@ -1131,6 +1131,8 @@ class Transformer:
                 costume_info.is_only_alternate_mesh = costume.get('PonySet', {}).get('IsOnlyAlternativeMesh', False)
                 costume_info.is_subset = costume.get('PonySet', {}).get('IsSubSet', False)
                 costume_info.subsets = costume.get('PonySet', {}).get('SubSets', [])
+                if costume_info.subsets:
+                    costume_info.subsets.insert(0, costume.id)
 
                 costume_info.parts = {
                     'body': costume.get('Parts', {}).get('Body', None),
@@ -1185,7 +1187,7 @@ class Transformer:
                 costume_part_info.type = costume_part.get('PonyPart', {}).get('Type', '').lower()
                 costume_part_info.apply_time = costume_part.get('PonyPart', {}).get('ApplyTime', 0)
                 costume_part_info.gem_price = costume_part.get('PonyPart', {}).get('PurchasePrice', 0)
-                costume_part_info.ingredients = costume_part.get('PonyPart', {}).get('Ingredients', [0] * 5)
+                costume_part_info.materials = costume_part.get('PonyPart', {}).get('Ingredients', [0] * 5)
 
                 
                 costume_part_info.image['main'] = self.add_image(
