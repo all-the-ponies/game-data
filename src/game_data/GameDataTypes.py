@@ -111,6 +111,7 @@ class PonyType(GenericObjectType):
     tasks: list[str] = field(default_factory = list)
     pro: list[str] = field(default_factory = list)
     collections: list[str] = field(default_factory = list)
+    costumes: list[GameObjectId] = field(default_factory = list)
     wiki_path: str = ''
 
 @dataclass
@@ -281,6 +282,7 @@ class CostumeBonus(DataClassJsonMixin):
 class CostumeType(GenericObjectType):
     category: Literal['costume'] = 'costume'
     image: ImageBase[Literal['alt']] = field(default_factory = dict)
+    pony: GameObjectId = ''
     enabled: bool = False
     can_be_new: bool = False
     is_subset: bool = False

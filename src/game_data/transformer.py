@@ -358,6 +358,8 @@ class Transformer:
                 pony_info.not_pony = pony.get('Misc', {}).get('IsNotPony', False)
                 pony_info.ban_pets = pony.get('Misc', {}).get('BenPets', False)
 
+                pony_info.costumes = [costume for costume in pony.get('Sets', {}).get('Sets', []) if costume]
+
                 if shop_data:
                     pony_info.unlock_level = shop_data.get('UnlockValue', 0)
                     pony_info.price = self.get_price(shop_data)
@@ -789,6 +791,10 @@ class Transformer:
                     pet_images/f'{pet.id}.png',
                 )
 
+                pet_info.pony = pet.get('Settings', {}).get('PonyUniqueID', '')
+                pet_info.flying = pet.get('Settings', {}).get('IsFlying', False)
+                pet_info.minecart_bonus = pet.get('Settings', {}).get('GameBonus', 0)
+                pet_info.task_bonus = pet.get('Settings', {}).get('TaskBonus', 0)
                 
                 shop_data = self.gameObjectData.get_object_shopdata(pet.id)
                 if shop_data:
@@ -1140,6 +1146,19 @@ class Transformer:
             except Exception as e:
                 e.add_note(f'Costume: {costume.id}')
                 console.print_exception()
+        
+        
+        for pony in self.game_data.game_objects.pony.objects.values():
+            if pony.costumes:
+                for id in pony.costumes:
+                    costumes[id].pony = pony.id
+        
+        for costume in costumes.values():
+            if costume.subsets:
+                for subset in costume.subsets:
+                    costumes[subset].subsets = costume.subsets
+                    if (not costumes[subset]):
+                        costumes[subset].pony = costume.pony
 
     def get_category_costume_part(self):
         costume_parts = self.game_data.game_objects.costume_part.objects
