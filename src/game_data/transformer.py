@@ -1329,3 +1329,5 @@ class Transformer:
         price.token = shopdata.get('TaskTokenID')
         price.daily_goals = self.daily_goals_shop.get(shopdata.id, 0)
 
+        return price
+
