@@ -15,7 +15,7 @@ def extract(arks_dir: Path, output: Path):
 
     arks = os.listdir(arks_dir)
     try:
-        sort_ark_filenames(arks)
+        arks = sort_ark_filenames(arks)
     except:
         console.print('[red]Could not sort ark files[/]')
 
