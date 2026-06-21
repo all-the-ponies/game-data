@@ -187,13 +187,13 @@ class Transformer:
     def save(self):
         console.log('Saving files')
         with open(self.output_folder/'game_version.json', 'w', encoding = 'utf-8') as file:
-            file.write(self.game_data.game_version.to_json(ensure_ascii = False))
+            file.write(self.game_data.game_version.model_dump_json(ensure_ascii = False))
         with open(self.output_folder/'game_objects.json', 'w', encoding = 'utf-8') as file:
-            file.write(self.game_data.game_objects.to_json(ensure_ascii = False, indent = 2))
+            file.write(self.game_data.game_objects.model_dump_json(ensure_ascii = False, indent = 2))
         with open(self.output_folder/'group_quests.json', 'w', encoding = 'utf-8') as file:
-            file.write(self.game_data.group_quests.to_json(ensure_ascii = False, indent = 2))
+            file.write(self.game_data.group_quests.model_dump_json(ensure_ascii = False, indent = 2))
         with open(self.output_folder/'fortune_shop.json', 'w', encoding = 'utf-8') as file:
-            file.write(self.game_data.fortune_shop.to_json(ensure_ascii = False, indent = 2))
+            file.write(self.game_data.fortune_shop.model_dump_json(ensure_ascii = False, indent = 2))
     
     def get_game_objects(self):
         self.get_category_pony()
@@ -1312,13 +1312,16 @@ class Transformer:
         else:
             console.print(f'[red]Could not find {game_paths}, {rel_path}[/]')
         
-        return RenamedFile(rel_path, used_game_name)
+        return RenamedFile(path = rel_path, original = used_game_name)
     
     def add_animated_image(self, game_path: str, dest: str | Path) -> RenamedFile:
         if os.path.exists(game_path):
             swf2webp(self.game_folder/game_path, dest, console = console, ffdec_path = self.ffdec)
         
-        return RenamedFile(Path(dest).relative_to(self.output_folder).as_posix(), game_path)
+        return RenamedFile(
+            path = Path(dest).relative_to(self.output_folder).as_posix(),
+            original = game_path,
+        )
     
     def get_price(self, shopdata: ShopItem):
         price = Price()

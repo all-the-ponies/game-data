@@ -16,7 +16,7 @@ from luna_kit.api import API
 from luna_kit.typings import DLCManifest
 
 from .console import console
-from .env import set_mode, load_env, GAME_DATA_ENV_VAR
+from .env import set_mode, load_env, GAME_DATA_ENV_VAR, is_dev
 from .downloader import download
 from .extractor import extract
 from .notify import Notifier
@@ -233,6 +233,9 @@ def main() -> None:
     if args.env:
         set_mode(prod = args.env == 'prod')
     load_env()
+
+    if is_dev():
+        console.print('[red]Currently running in dev environment[/]')
 
     match args.command:
         case 'build':
