@@ -1,13 +1,15 @@
 # PYTHON_ARGCOMPLETE_OK
 
-import resource
-
 from argparse import ArgumentParser
+import io
 import json
+import mimetypes
 import os
 from pathlib import Path
+import resource
 import shutil
 
+from PIL import Image
 import argcomplete
 from botocore.exceptions import ClientError
 import google_play_scraper as gplay
@@ -16,12 +18,13 @@ from luna_kit.api import API
 from luna_kit.typings import DLCManifest
 
 from .console import console
-from .env import set_mode, load_env, GAME_DATA_ENV_VAR, is_dev
+from .crop import crop_image
 from .downloader import download
+from .env import GAME_DATA_ENV_VAR, is_dev, load_env, set_mode
 from .extractor import extract
 from .notify import Notifier
 from .s3 import BUCKET, get_s3_client
-from .sync import sync
+from .sync import sync, upload_file
 from .transformer import Transformer
 
 PACKAGE_NAME = "com.gameloft.android.ANMP.GloftPOHM"
@@ -155,7 +158,8 @@ def build_cdn(
             console.print('[red]Failed to save dlc_manifest[/]')
     
 
-def main() -> None:
+def create_argparser():
+
     argparser = ArgumentParser()
 
     argparser.add_argument(
@@ -226,7 +230,32 @@ def main() -> None:
         default = 'ffdec',
     )
 
+
+    
+    upload = command.add_parser(
+        'upload',
+        description = 'Upload a single file',
+    )
+
+    upload.add_argument(
+        '-i', '--input',
+        dest = 'input',
+        help = 'Input file',
+        required = True,
+    )
+
+    upload.add_argument(
+        '-k', '--key',
+        dest = 'key',
+        help = 'Destination key',
+    )
+
     argcomplete.autocomplete(argparser)
+
+    return argparser
+
+def main() -> None:
+    argparser = create_argparser()
 
     args = argparser.parse_args()
 
@@ -249,5 +278,40 @@ def main() -> None:
                 ffdec = args.ffdec,
             )
     
-    peak_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
-    print(f"Peak Memory Usage: {peak_memory:.2f} MB")
+            peak_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+            print(f"Peak Memory Usage: {peak_memory:.2f} MB")
+
+        case 'upload':
+            input: str = args.input
+            key: str = args.key or os.path.basename(input)
+
+            if not os.path.exists(input):
+                raise FileNotFoundError(f'File "{input}" does not exist')
+            
+            content_type, _ = mimetypes.guess_type(input)
+
+            with open(input, 'rb') as file:
+                file_data = file.read()
+            
+            if content_type and content_type.startswith('image/'):
+                image = Image.open(input)
+                if not getattr(image, 'is_animated', False):
+                    image = crop_image(image)
+                
+                    image_file = io.BytesIO()
+                    image.save(image_file, format = content_type.removeprefix('image/'))
+                    file_data = image_file.getvalue()
+            
+            console.print(f'Uploading [yellow]{key}[/]')
+            
+            upload_file(
+                get_s3_client(),
+                BUCKET,
+                file_data,
+                key,
+                content_type,
+                override = True,
+            )
+
+            console.print('[green]Uploaded![/]')
+            

@@ -93,7 +93,6 @@ def find_in_sprite(sprite: str | Path, frame: str):
     with open(sprite, 'r', encoding = 'utf-8') as file:
         sprite_content = file.read()
     
-    console.print('pattern', fr'FRAME\s+"{re.escape(frame)}"(\s*\/\/.*)?\s*{'{'}[\S\s]*?FM\s+(0x[\da-zA-Z]+)')
     match = re.search(
         fr'FRAME\s+"{re.escape(frame)}"(\s*\/\/.*)?\s*{'{'}[\S\s]*?FM\s+(0x[\da-zA-Z]+)',
         sprite_content,
@@ -101,6 +100,7 @@ def find_in_sprite(sprite: str | Path, frame: str):
     )
 
     if match is None:
+        console.print('pattern', fr'FRAME\s+"{re.escape(frame)}"(\s*\/\/.*)?\s*{'{'}[\S\s]*?FM\s+(0x[\da-zA-Z]+)')
         console.print('could not find frame')
         return
     
@@ -1155,12 +1155,20 @@ class Transformer:
                 for id in pony.costumes:
                     costumes[id].pony = pony.id
         
+
         for costume in costumes.values():
+            pony = self.game_data.game_objects.pony.objects.get(costume.pony)
             if costume.subsets:
                 for subset in costume.subsets:
                     costumes[subset].subsets = costume.subsets
-                    if (not costumes[subset]):
+                    if not costumes[subset].pony:
+                        if pony and subset not in pony.costumes:
+                            pony.costumes.append(subset)
                         costumes[subset].pony = costume.pony
+        
+        for costume in costumes.values():
+            if not costume.pony:
+                costume.tags.append('unused')
 
     def get_category_costume_part(self):
         costume_parts = self.game_data.game_objects.costume_part.objects

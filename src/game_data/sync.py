@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import hashlib
+import io
 import json
 import mimetypes
 import os
@@ -11,7 +12,14 @@ import botocore.exceptions
 from botocore.exceptions import ClientError
 from rich.progress import Progress
 
-from .GameDataTypes import GameVersion, CategoryName, GameObjects, CATEGORY_NAMES, GameObjectId, GenericObjectType
+from .GameDataTypes import (
+    CATEGORY_NAMES,
+    CategoryName,
+    GameObjectId,
+    GameObjects,
+    GameVersion,
+    GenericObjectType,
+)
 from .console import COLUMNS, console, track
 from .s3 import BUCKET, get_s3_client
 
@@ -21,16 +29,21 @@ if TYPE_CHECKING:
 MAX_WORKERS = 10
 
 
-def get_image_metadata(path: str | Path) -> dict[Literal['width', 'height'], str]:
-    image = Image.open(path)
+def get_image_metadata(file: bytes) -> dict[Literal['width', 'height'], str]:
+    image = Image.open(io.BytesIO(file))
     return {
         'width': str(image.width),
         'height': str(image.height),
     }
 
-def upload_single_file(client: 'S3Client', bucket: str, filepath: Path, key: str):
-    content_type, _ = mimetypes.guess_type(filepath)
-
+def upload_file(
+    client: 'S3Client',
+    bucket: str,
+    data: bytes,
+    key: str,
+    content_type: str | None = None,
+    override: bool = False,
+):
     metadata = {}
 
     extra_args = {}
@@ -38,45 +51,60 @@ def upload_single_file(client: 'S3Client', bucket: str, filepath: Path, key: str
     if content_type:
         extra_args['ContentType'] = content_type
         if content_type.startswith('image/'):
-            metadata.update(get_image_metadata(filepath))
+            metadata.update(get_image_metadata(data))
     
-    file_data = filepath.read_bytes()
-    
-    if filepath.suffix == '.json':
-        data = json.loads(file_data)
-        file_data = json.dumps(data, ensure_ascii = False, separators=(",", ":")).encode('utf-8')
-    
-    hash = hashlib.sha256(file_data).hexdigest()
+    if content_type == 'application/json':
+        json_data = json.loads(data)
+        data = json.dumps(json_data, ensure_ascii = False, separators=(",", ":")).encode('utf-8')
+        
+    hash = hashlib.sha256(data).hexdigest()
 
     metadata['hash'] = hash
 
     upload = True
 
-    try:
-        object = client.head_object(Bucket = bucket, Key = key)
-        if object['Metadata'].get('hash') == hash:
-            upload = False
-    except botocore.exceptions.ClientError as e:
-        if e.response.get('Error', {}).get('Code', '') == '404':
-            upload = True
-        else:
-            raise
+    if override:
+        metadata['override'] = 'true'
+    else:
+        try:
+            object = client.head_object(Bucket = bucket, Key = key)
+            if object['Metadata'].get('override') == 'true' or object['Metadata'].get('hash') == hash:
+                upload = False
+        except botocore.exceptions.ClientError as e:
+            if e.response.get('Error', {}).get('Code', '') == '404':
+                upload = True
+            else:
+                raise
 
     if upload:
         try:
             client.put_object(
                 Bucket = bucket,
                 Key = key,
-                Body = file_data,
+                Body = data,
                 Metadata = metadata,
                 **extra_args,
             )
-
-
         except Exception as e:
-            e.add_note(f'File: {filepath}')
+            e.add_note(f'File: {key}')
             console.print_exception()
 
+def upload_single_file(
+    client: 'S3Client',
+    bucket: str,
+    filepath: Path,
+    key: str,
+):
+    file_data = filepath.read_bytes()
+    content_type, _ = mimetypes.guess_type(filepath)
+
+    upload_file(
+        client = client,
+        bucket = bucket,
+        data = file_data,
+        key = key,
+        content_type = content_type,
+    )
 
 
 def sync(dist_folder: str | Path):

@@ -167,3 +167,4 @@ raw/*
 !raw/.gitkeep
 notifications*.json
 notifications/
+resources/

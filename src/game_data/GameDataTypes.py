@@ -112,7 +112,7 @@ class PonyType(GenericObjectType):
     wiki_path: str = ''
 
 class HouseBuild(BaseModel):
-    time: int = 0
+    time: float = 0
     skip_cost: int = 0
     xp: int = 0
 
@@ -218,8 +218,8 @@ class PathType(GenericObjectType):
 class BoosterType(GenericObjectType):
     category: Literal['booster'] = 'booster'
     type: Literal['xp', 'bits'] | None = None
-    time: int = 0
-    multiplier: int = 0
+    time: float = 0
+    multiplier: float = 0
 
 class FarmCost(BaseModel):
     shard: GameObjectId
