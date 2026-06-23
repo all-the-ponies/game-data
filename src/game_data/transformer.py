@@ -1323,7 +1323,7 @@ class Transformer:
         return RenamedFile(path = rel_path, original = used_game_name)
     
     def add_animated_image(self, game_path: str, dest: str | Path) -> RenamedFile:
-        if os.path.exists(game_path):
+        if os.path.exists(self.game_folder/game_path):
             swf2webp(self.game_folder/game_path, dest, console = console, ffdec_path = self.ffdec)
         
         return RenamedFile(
