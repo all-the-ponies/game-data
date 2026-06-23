@@ -1380,6 +1380,7 @@ class Transformer:
                 path = path.replace('\\', '/')
                 source_paths.add(path.removeprefix('/'))
                 source_paths.add(os.path.basename(path))
+        
 
         for filename in source_paths:
             name = os.path.splitext(filename)[0]
@@ -1388,7 +1389,17 @@ class Transformer:
                 image = Image.open(self.game_folder/(name + '.png'))
             elif os.path.exists(self.game_folder/(name + '.pvr')):
                 image = PVR(self.game_folder/(name + '.pvr')).image
-            
+            else:
+                found_paths = list(self.game_folder.glob(name + '.*', case_sensitive = False))
+                if len(found_paths):
+                    for path in found_paths:
+                        if path.suffix == '.png':
+                            image = Image.open(path)
+                            break
+                        if path.suffix == '.pvr' and '.alpha' not in path.name:
+                            image = PVR(path).image
+                            break
+
             if image is not None:
                 used_game_name = filename
                 break
