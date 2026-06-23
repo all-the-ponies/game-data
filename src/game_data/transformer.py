@@ -14,7 +14,13 @@ from luna_kit.gameobjectdata import GameObjectData, ShopItem
 from luna_kit.loc import LOC
 from luna_kit.pvr import PVR
 from luna_kit.swf import swf2webp
-from luna_kit.typings import DefaultGameCampaignType, FusionData, PrizeTypes, GroupQuestsType
+from luna_kit.typings import (
+    DefaultGameCampaignType,
+    FusionData,
+    GroupQuestsType,
+    PonyTasksType,
+    PrizeTypes,
+)
 from luna_kit.xml import parse_xml
 
 from .GameDataTypes import *
@@ -29,6 +35,7 @@ class GameData:
     game_objects: GameObjects = field(default_factory = GameObjects)
     group_quests: GroupQuests = field(default_factory = GroupQuests)
     fortune_shop: FortuneShop = field(default_factory = FortuneShop)
+    tasks_data: TasksData = field(default_factory = TasksData)
 
 class ObjectOverride(TypedDict):
     preferred_name: TranslatableString
@@ -194,6 +201,8 @@ class Transformer:
             file.write(self.game_data.group_quests.model_dump_json(ensure_ascii = False, indent = 2))
         with open(self.output_folder/'fortune_shop.json', 'w', encoding = 'utf-8') as file:
             file.write(self.game_data.fortune_shop.model_dump_json(ensure_ascii = False, indent = 2))
+        with open(self.output_folder/'tasks_data.json', 'w', encoding = 'utf-8') as file:
+            file.write(self.game_data.tasks_data.model_dump_json(ensure_ascii = False, indent = 2))
     
     def get_game_objects(self):
         self.get_category_pony()
@@ -209,6 +218,7 @@ class Transformer:
         self.get_category_path()
         self.get_category_item()
         self.get_category_booster()
+        self.get_tasks()
         self.get_category_token()
         self.get_category_consumable()
         self.get_category_costume()
@@ -981,13 +991,22 @@ class Transformer:
                 )
 
                 token_info.consumable = token.get('QuestSpecialItem', {}).get('ConsumableId', '')
-                token_info.chance = token.get('QuestSpecialItem', {}).get('Chance', '')
+                token_info.chance = self.defaultGameCampaign['game_object_data']['QuestSpecialItem'] \
+                    .get(token.id, {}).get('Chance', token.get('QuestSpecialItem', {}).get('Chance', ''))
 
                 token_info.tasks = [task for task in token.get('QuestSpecialItem', {}).get('PonyTasks', []) if task]
 
                 token_info.unlimited = token.get('SaveSettings', {}).get('IsUnlimited', False)
                 token_info.no_reset = token.get('SaveSettings', {}).get('DisableReset', False)
                 token_info.special = token.get('Other', {}).get('SpecialCaseID', 0)
+
+                for task in token_info.tasks:
+                    task_overrides = self.defaultGameCampaign['game_object_data']['QuestSpecialItem'].get(token.id, {}).get('PonyTasksOverride', {}).get(task, {})
+                    
+                    self.game_data.tasks_data.tasks[task].reward.token = token.id
+                    self.game_data.tasks_data.tasks[task].reward.token_amount = task_overrides.get('Amount', 1)
+                    self.game_data.tasks_data.tasks[task].chance = task_overrides.get('Chance', token_info.chance)
+
                 
             except Exception as e:
                 e.add_note(f'Token: {token.id}')
@@ -1189,13 +1208,16 @@ class Transformer:
                 )
                 
                 costume_parts[costume_part.id] = costume_part_info
+
+                part_overrides = self.defaultGameCampaign.get('game_object_data', {}).get('PonyPart', {}).get(costume_part.id, {})
                 
                 costume_part_info.model_name = costume_part.get('PonyPart', {}).get('ModelName', '')
                 costume_part_info.linked_part = costume_part.get('PonyPart', {}).get('LinkedPart', None)
                 costume_part_info.type = costume_part.get('PonyPart', {}).get('Type', '').lower()
-                costume_part_info.apply_time = costume_part.get('PonyPart', {}).get('ApplyTime', 0)
-                costume_part_info.gem_price = costume_part.get('PonyPart', {}).get('PurchasePrice', 0)
-                costume_part_info.materials = costume_part.get('PonyPart', {}).get('Ingredients', [0] * 5)
+                costume_part_info.apply_time = part_overrides.get('ApplyTime', costume_part.get('PonyPart', {}).get('ApplyTime', 0))
+                costume_part_info.gem_price = part_overrides.get('PurchasePrice', costume_part.get('PonyPart', {}).get('PurchasePrice', 0))
+                costume_part_info.materials = part_overrides.get('Ingredients', costume_part.get('PonyPart', {}).get('Ingredients', [0] * 5))
+                costume_part_info.apply_price = part_overrides.get('ApplyPrice', 0)
 
                 
                 costume_part_info.image['main'] = self.add_image(
@@ -1283,6 +1305,64 @@ class Transformer:
                         royal = dict(zip(price_names, item.get('sub_price_list', []))),
                     )
                 )
+
+    def get_tasks(self):
+        with open(self.game_folder/'ponytasks.json', 'r') as file:
+            ponytasks: PonyTasksType = json.load(file)
+        
+        task_icons = self.images_folder/'tasks'
+        task_icons.mkdir(parents = True, exist_ok = True)
+        
+        for index, task in enumerate(track(ponytasks['PonyTasks'], description = 'Getting tasks...')):
+            task_info = TaskEntry(
+                id = task['ID'],
+                index = index,
+                name = self.translate_string(task['LocalizedName']),
+                pony = task['Pony'],
+                duration = task['Duration'],
+                hidden = task.get('HideTask', False),
+                skip_cost = task['SkipCost'],
+            )
+
+            task_info.requirement.pony = task.get('PonyRequirement', '')
+            task_info.requirement.house = task.get('GoToHouse', '')
+            task_info.requirement.quests = task.get('QuestRequirements', [])
+
+            if task_info.pony in self.game_data.game_objects.pony.objects:
+                self.game_data.game_objects.pony.objects[task_info.pony].tasks.append(task_info.id)
+            else:
+                continue
+
+            self.game_data.tasks_data.tasks[task_info.id] = task_info
+
+            task_info.reward.bits = task.get('RewardCoins', 0)
+            task_info.reward.gems = task.get('RewardGems', 0)
+            task_info.reward.xp = task.get('RewardXp', 0)
+            task_info.reward.consumable = task.get('RewardConsumable', '')
+            task_info.reward.consumable_amount = task.get('RewardConsumableAmount', 0)
+
+            task_info.image = self.add_image(
+                [task['Icon']],
+                task_icons/f'{task_info.id}.png',
+            )
+
+            
+            
+        for task in self.defaultGameCampaign.get('PonyTaskData', []):
+            if task['ID'] not in self.game_data.tasks_data.tasks:
+                continue
+            task_info = self.game_data.tasks_data.tasks[task['ID']]
+
+            if 'SkipCost' in task:
+                task_info.skip_cost = task['SkipCost']
+            if 'RewardCoins' in task:
+                task_info.reward.bits = task['RewardCoins']
+            if 'RewardXp' in task:
+                task_info.reward.xp = task['RewardXp']
+            if 'RewardGems' in task:
+                task_info.reward.gems = task['RewardGems']
+            if 'Duration' in task:
+                task_info.duration = task['Duration']
 
     
     def translate_string(self, key: str) -> TranslatableString:

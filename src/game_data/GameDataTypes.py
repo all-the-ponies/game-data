@@ -35,8 +35,8 @@ type TranslatableString = dict[Language, str]
 type AltName = dict[Language, list[str]]
 
 class RenamedFile(BaseModel):
-    path: str
-    original: Optional[str]
+    path: str = ''
+    original: Optional[str] = None
 
 type ImageBase[T] = dict[T | Literal['main'], RenamedFile]
 
@@ -75,17 +75,6 @@ class MinigameData(BaseModel):
     skip_cost: int = 0
     exp_rank: int = 0
     has_wings: bool = False
-
-class TaskData(BaseModel):
-    name: TranslatableString
-    time: int
-    xp: int
-    bits: int
-    gems: int
-    token: str
-    chance: float
-    token_amount: int
-    requires: str
 
 class PonyType(GenericObjectType):
     category: Literal['pony'] = 'pony'
@@ -276,6 +265,7 @@ class CostumePartType(BaseModel):
     linked_part: GameObjectId | None = None
     type: Literal['body', 'mane', 'tail'] = 'body'
     apply_time: int = 0
+    apply_price: int = 0
     materials: list[int] = Field(default_factory = list)
     gem_price: int = 0
 
@@ -381,3 +371,35 @@ class GameObjects(BaseModel):
 class GameVersion(BaseModel):
     game_version: str = Field(default = '')
     content_version: str = Field(default = '')
+
+class TaskRequirement(BaseModel):
+    pony: GameObjectId = ''
+    house: GameObjectId | Literal['<Home>'] = ''
+    quests: list[str] = Field(default_factory = list)
+
+class TaskReward(BaseModel):
+    bits: int = 0
+    gems: int = 0
+    xp: int = 0
+    consumable: GameObjectId = ''
+    consumable_amount: int = 0
+    token: GameObjectId = ''
+    token_amount: int = 0
+    
+
+class TaskEntry(BaseModel):
+    id: str
+    index: int
+    pony: GameObjectId = ''
+    name: TranslatableString = Field(default_factory = dict)
+    image: RenamedFile = Field(default_factory = RenamedFile)
+    requirement: TaskRequirement = Field(default_factory = TaskRequirement)
+    reward: TaskReward = Field(default_factory = TaskReward)
+    chance: float = 100.0
+    skip_cost: int = 0
+    duration: float = 0
+    hidden: bool = False
+    
+
+class TasksData(BaseModel):
+    tasks: dict[str, TaskEntry] = Field(default_factory = dict)
