@@ -1376,8 +1376,9 @@ class Transformer:
         source_paths = set[str]()
         for path in game_paths:
             if path:
+                path = path.strip()
                 path = path.replace('\\', '/')
-                source_paths.add(path.removeprefix('/').removeprefix('\\'))
+                source_paths.add(path.removeprefix('/'))
                 source_paths.add(os.path.basename(path))
 
         for filename in source_paths:
