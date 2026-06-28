@@ -2,18 +2,651 @@
   "pony": {
     "Pony_Minty_G4": {
       "preferred_name": {
-        "english": "Minty (G4)"
+        "arabic": "مينتي (G4)",
+        "chinese": "Minty (G4)",
+        "english": "Minty (G4)",
+        "french": "Minty (G4)",
+        "german": "Minty (G4)",
+        "italian": "Minty (G4)",
+        "japanese": "ミンティ (G4)",
+        "korean": "Minty (G4)",
+        "brazilian portuguese": "Minty (G4)",
+        "russian": "Минти (G4)",
+        "spanish": "Minty (G4)",
+        "thai": "มินตี้ (G4)",
+        "turkish": "Mint (G4)y"
       }
     },
     "Pony_Jonagold": {
-      "tags": ["unused"]
+      "tags": [
+        "unused"
+      ]
     },
     "Pony_Nightmare_Starlight_Glimmer_UPD98": {
       "wiki_path": "Nightmare_Starlight_Glimmer_(10.7)"
     },
     "Pony_Tempest_Shadow": {
       "alt_name": {
-          "english": ["Tempest Shadow"]
+        "english": [
+          "Tempest Shadow"
+        ]
+      }
+    },
+    "Pony_Muffins": {
+      "alt_name": {
+        "english": [
+          "Derpy",
+          "Ditzy Doo"
+        ]
+      }
+    },
+    "Pony_Mail_Muffins": {
+      "alt_name": {
+        "english": [
+          "Mail Derpy"
+        ]
+      }
+    },
+    "Pony_Wise_Muffins": {
+      "alt_name": {
+        "english": [
+          "Wise Derpy"
+        ]
+      }
+    },
+    "Pony_Future_Muffins": {
+      "alt_name": {
+        "english": [
+          "Future Derpy"
+        ]
+      }
+    },
+    "Pony_Crystal_Muffins": {
+      "alt_name": {
+        "english": [
+          "Crystal Derpy"
+        ]
+      }
+    },
+    "Pony_Oriental_Muffins": {
+      "alt_name": {
+        "english": [
+          "Shire Lanka Derpy"
+        ]
+      }
+    },
+    "Pony_Class_Rep_Muffins": {
+      "alt_name": {
+        "english": [
+          "Class Rep Derpy"
+        ]
+      }
+    },
+    "Pony_Vampire_Muffins": {
+      "alt_name": {
+        "english": [
+          "Vampire Derpy"
+        ]
+      }
+    },
+    "Pony_Nightmare_Muffins": {
+      "alt_name": {
+        "english": [
+          "Nightmare Derpy"
+        ]
+      }
+    },
+    "Pony_Mean_Muffins": {
+      "alt_name": {
+        "english": [
+          "Mean Derpy"
+        ]
+      }
+    },
+    "Pony_Cheese_Sandwich": {
+      "alt_name": {
+        "english": [
+          "\"Weird Al\" Yancovic",
+          "Weird Al"
+        ]
+      }
+    },
+    "Pony_Rockin_Cheese_Sandwich": {
+      "alt_name": {
+        "english": [
+          "Rockin' \"Weird Al\" Yancovic",
+          "Rockin' Weird Al"
+        ]
+      }
+    },
+    "Pony_Alchemist_Cheese_Sandwich": {
+      "alt_name": {
+        "english": [
+          "Alchemist \"Weird Al\" Yancovic",
+          "Alchemist Weird Al",
+          "Edward Elric"
+        ]
+      }
+    },
+    "Pony_Vampire_Cheese_Sandwich": {
+      "alt_name": {
+        "english": [
+          "Vampire \"Weird Al\" Yancovic",
+          "Vampire Weird Al"
+        ]
+      }
+    },
+    "Pony_Montague_Cheese_Sandwich": {
+      "alt_name": {
+        "english": [
+          "Montague \"Weird Al\" Yancovic",
+          "Montague Weird Al"
+        ]
+      }
+    },
+    "Pony_Mean_Cheese_Sandwich": {
+      "alt_name": {
+        "english": [
+          "Mean \"Weird Al\" Yancovic",
+          "Mean Weird Al"
+        ]
+      }
+    },
+    "Pony_Trainee_Bulk_Biceps": {
+      "alt_name": {
+        "english": ["Goku"]
+      }
+    },
+    "Pony_DrWhooves": {
+      "alt_name": {
+        "english": [
+          "Time Turner",
+          "Dr. Whooves",
+          "Doctor Whooves",
+          "Doctor Hooves",
+          "Doctor Who"
+        ]
+      }
+    },
+    "Pony_Timely_Dr_Hooves": {
+      "alt_name": {
+        "english": [
+          "Timely Time Turner",
+          "Timely Dr. Whooves",
+          "Timely Doctor Whooves",
+          "Timely Doctor Hooves",
+          "Timely Doctor Who"
+        ]
+      }
+    },
+    "Pony_Sentai_Rainbow_Dash": {
+      "alt_name": {
+        "english": ["Blue Power Ranger"]
+      }
+    },
+    "Pony_Ninja_Applejack": {
+      "alt_name": {
+        "english": ["Kakashi"]
+      }
+    },
+    "Pony_Magical_Filly_Twilight_Sparkle": {
+      "alt_name": {
+        "english": ["Cardcaptor"]
+      }
+    },
+    "Pony_Alt_Celestia": {
+      "alt_name": {
+        "english": ["Usagi"]
+      }
+    },
+    "Pony_Natural_Satellite": {
+      "alt_name": {
+        "english": ["Chibiusa"]
+      }
+    },
+    "Pony_Saturnalia": {
+      "alt_name": {
+        "english": ["Sailor Saturn"]
+      }
+    },
+    "Pony_Juno": {
+      "alt_name": {
+        "english": ["Sailor Jupiter"]
+      }
+    },
+    "Pony_Aqua_Mist": {
+      "alt_name": {
+        "english": ["Sailor Mercury"]
+      }
+    },
+    "Pony_Halloween_01": {
+      "alt_name": {
+        "english": ["Sailor Moon"]
+      }
+    },
+    "Celena": {
+      "alt_name": {
+        "english": ["Sailor Moon"]
+      }
+    },
+    "Pony_Halloween_02": {
+      "alt_name": {
+        "english": ["Jem"]
+      }
+    },
+    "Pony_Shining_Light": {
+      "alt_name": {
+        "arabic": ["شاينينغ لايت"],
+        "chinese": ["Shining Light"],
+        "english": ["Shining Light"],
+        "french": ["Shining Light"],
+        "german": ["Shining Light"],
+        "italian": ["Shining Light"],
+        "japanese": ["シャイニング ライト"],
+        "korean": ["Shining Light"],
+        "brazilian portuguese": ["Shining Light"],
+        "russian": ["Шайнинг Лайт"],
+        "spanish": ["Shining Light"],
+        "thai": ["ไชนิ่งไลท์"],
+        "turkish": ["Shining Light"]
+      }
+    },
+    "Pony_Blonn_Di": {
+      "alt_name": {
+        "arabic": ["بلون دي"],
+        "chinese": ["Blonn Di"],
+        "english": ["Blonn Di"],
+        "french": ["Blonn Di"],
+        "german": ["Blonn Di"],
+        "italian": ["Blonn Di"],
+        "japanese": ["ブロンディー"],
+        "korean": ["Blonn Di"],
+        "brazilian portuguese": ["Blonn Di"],
+        "russian": ["Блонн Ди"],
+        "spanish": ["Blonn Di"],
+        "thai": ["บลอนน์ดิ"],
+        "turkish": ["Blonn Di"]
+      }
+    },
+    "Pony_Minotaurocellus_Red": {
+      "preferred_name": {
+        "arabic": "مينوتوروسيلوس (أحمر)",
+        "chinese": "Minotaurocellus（红色）",
+        "english": "Minotaurocellus (Red)",
+        "french": "Minotaurocellus (Rouge)",
+        "german": "Minotaurocellus (Rot)",
+        "italian": "Minotaurocellus (Rosso)",
+        "japanese": "ミノタウロセラス（赤）",
+        "korean": "Minotaurocellus (빨간색)",
+        "brazilian portuguese": "Minotaurocellus (Vermelho)",
+        "russian": "Минотавроцеллус (красный)",
+        "spanish": "Minotaurocellus (rojo)",
+        "thai": "มิโนทอโรเซลลัส (สีแดง)",
+        "turkish": "Minotaurocellus (Kırmızı)"
+      }
+    },
+    "Pony_Minotaurocellus_Blue": {
+      "preferred_name": {
+        "arabic": "مينوتوروسيلوس (أزرق)",
+        "chinese": "Minotaurocellus（蓝色）",
+        "english": "Minotaurocellus (Blue)",
+        "french": "Minotaurocellus (Bleu)",
+        "german": "Minotaurocellus (Blau)",
+        "italian": "Minotaurocellus (Blu)",
+        "japanese": "ミノタウロセラス（青）",
+        "korean": "Minotaurocellus (파란색)",
+        "brazilian portuguese": "Minotaurocellus (Azul)",
+        "russian": "Минотавроцеллус (синий)",
+        "spanish": "Minotaurocellus (azul)",
+        "thai": "มิโนทอโรเซลลัส (สีน้ําเงิน)",
+        "turkish": "Minotaurocellus (Mavi)"
+      }
+    },
+    "Pony_Minotaurocellus_Green": {
+      "preferred_name": {
+        "arabic": "مينوتوروسيلوس (أخضر)",
+        "chinese": "Minotaurocellus（绿色）",
+        "english": "Minotaurocellus (Green)",
+        "french": "Minotaurocellus (Vert)",
+        "german": "Minotaurocellus (Grün)",
+        "italian": "Minotaurocellus (Verde)",
+        "japanese": "ミノタウロセラス（緑）",
+        "korean": "Minotaurocellus(녹색)",
+        "brazilian portuguese": "Minotaurocellus (Verde)",
+        "russian": "Минотавроцеллус (зеленый)",
+        "spanish": "Minotaurocellus (Verde)",
+        "thai": "มิโนทอโรเซลลัส (สีเขียว)",
+        "turkish": "Minotaurocellus (Yeşil)"
+      }
+    },
+    "Pony_Minotaurocellus_Green2": {
+      "preferred_name": {
+        "arabic": "مينوتوروسيلوس (أخضر)",
+        "chinese": "Minotaurocellus（绿色）",
+        "english": "Minotaurocellus (Green)",
+        "french": "Minotaurocellus (Vert)",
+        "german": "Minotaurocellus (Grün)",
+        "italian": "Minotaurocellus (Verde)",
+        "japanese": "ミノタウロセラス（緑）",
+        "korean": "Minotaurocellus(녹색)",
+        "brazilian portuguese": "Minotaurocellus (Verde)",
+        "russian": "Минотавроцеллус (зеленый)",
+        "spanish": "Minotaurocellus (Verde)",
+        "thai": "มิโนทอโรเซลลัส (สีเขียว)",
+        "turkish": "Minotaurocellus (Yeşil)"
+      }
+    },
+    "Pony_Minotaurocellus_Yellow": {
+      "preferred_name": {
+        "arabic": "مينوتوروسيلوس (أصفر)",
+        "chinese": "Minotaurocellus（黄色）",
+        "english": "Minotaurocellus (Yellow)",
+        "french": "Minotaurocellus (Jaune)",
+        "german": "Minotaurocellus (Gelb)",
+        "italian": "Minotaurocellus (Giallo)",
+        "japanese": "ミノタウロセラス（黄色）",
+        "korean": "Minotaurocellus(노란색)",
+        "brazilian portuguese": "Minotaurocellus (Amarelo)",
+        "russian": "Минотавроцеллус (желтый)",
+        "spanish": "Minotaurocellus (amarillo)",
+        "thai": "มิโนทอโรเซลลัส (สีเหลือง)",
+        "turkish": "Minotaurocellus (Sarı)"
+      }
+    },
+    "Pony_Minotaurocellus_Purple": {
+      "preferred_name": {
+        "arabic": "مينوتوروسيلوس (أرجواني)",
+        "chinese": "Minotaurocellus（紫色）",
+        "english": "Minotaurocellus (Purple)",
+        "french": "Minotaurocellus (Violet)",
+        "german": "Minotaurocellus (Lila)",
+        "italian": "Minotaurocellus (Viola)",
+        "japanese": "ミノタウロセラス（紫）",
+        "korean": "Minotaurocellus(보라색)",
+        "brazilian portuguese": "Minotaurocellus (roxo)",
+        "russian": "Минотавроцеллус (фиолетовый)",
+        "spanish": "Minotaurocellus (Púrpura)",
+        "thai": "มิโนทอโรเซลลัส (สีม่วง)",
+        "turkish": "Minotaurocellus (Mor)"
+      }
+    },
+    "Pony_Minotaurocellus_Rose": {
+      "preferred_name": {
+        "arabic": "مينوتوروسيلوس (لون القرنفل)",
+        "chinese": "Minotaurocellus（粉色的）",
+        "english": "Minotaurocellus (Pink)",
+        "french": "Minotaurocellus (Rose)",
+        "german": "Minotaurocellus (Rosa)",
+        "italian": "Minotaurocellus (Rosa)",
+        "japanese": "ミノタウロセラス（ピンク）",
+        "korean": "Minotaurocellus(분홍색)",
+        "brazilian portuguese": "Minotaurocellus (Rosa)",
+        "russian": "Минотавроцеллус (Розовый)",
+        "spanish": "Minotaurocellus (Rosa)",
+        "thai": "มิโนทอโรเซลลัส (สีชมพู)",
+        "turkish": "Minotaurocellus (Pembe)"
+      }
+    },
+    "Pony_Wingless_Rainbow_Dash": {
+      "preferred_name": {
+        "arabic": "Wingless Rainbow Dash",
+        "chinese": "Wingless Rainbow Dash",
+        "english": "Wingless Rainbow Dash",
+        "french": "Wingless Rainbow Dash",
+        "german": "Wingless Rainbow Dash",
+        "italian": "Wingless Rainbow Dash",
+        "japanese": "Wingless Rainbow Dash",
+        "korean": "Wingless Rainbow Dash",
+        "brazilian portuguese": "Wingless Rainbow Dash",
+        "russian": "Wingless Rainbow Dash",
+        "spanish": "Wingless Rainbow Dash",
+        "thai": "Wingless Rainbow Dash",
+        "turkish": "Wingless Rainbow Dash"
+      },
+      "wiki_path": "Wingless Rainbow Dash"
+    },
+    "Pony_Sweet_Biscuit": {
+      "alt_name": {
+        "english": [
+          "Sweet Biscuit"
+        ]
+      }
+    },
+    "Pony_Crystal_Berryshine": {
+      "alt_name": {
+        "arabic": [
+          "بيري شاين الكريستالية"
+        ],
+        "chinese": [
+          "Crystal Berryshine",
+          "Crystal Berry Punch"
+        ],
+        "english": [
+          "Crystal Berryshine",
+          "Crystal Berry Punch"
+        ],
+        "french": [
+          "Crystal Berryshine",
+          "Crystal Berry Punch"
+        ],
+        "german": [
+          "Crystal Berryshine",
+          "Crystal Berry Punch"
+        ],
+        "italian": [
+          "Crystal Berryshine",
+          "Crystal Berry Punch"
+        ],
+        "japanese": [
+          "クリスタル|ベリー|シャイン"
+        ],
+        "korean": [
+          "Crystal Berryshine",
+          "Crystal Berry Punch"
+        ],
+        "brazilian portuguese": [
+          "Crystal Berryshine",
+          "Crystal Berry Punch"
+        ],
+        "russian": [
+          "Кристальная Берришайн"
+        ],
+        "spanish": [
+          "Crystal Berryshine",
+          "Crystal Berry Punch"
+        ],
+        "thai": [
+          "เบอร์รี่ไชน์|คริสตัล"
+        ],
+        "turkish": [
+          "Crystal Berryshine",
+          "Crystal Berry Punch"
+        ]
+      },
+      "wiki_path": "Crystal_Berryshine"
+    },
+    "Pony_Crystal_Luna_Hair_Test": {
+      "preferred_name": {
+        "arabic": "الأميرة لونا الكريستالية اختبار الشعر",
+        "chinese": "Crystal Princess Luna 头发测试",
+        "english": "Crystal Princess Luna Hair Test",
+        "french": "Test capillaire Crystal Princess Luna",
+        "german": "Crystal Princess Luna Haartest",
+        "italian": "Test dei capelli di Crystal Princess Luna",
+        "japanese": "クリスタルプリンセスルナヘアテスト",
+        "korean": "Crystal Princess Luna 헤어 테스트",
+        "brazilian portuguese": "Teste de cabelo Crystal Princess Luna",
+        "russian": "Тест на волосы Кристальная Принцесса Луна",
+        "spanish": "Prueba de cabello Crystal Princess Luna",
+        "thai": "การทดสอบเส้นผมคริสตัลเจ้าหญิงลูน่า",
+        "turkish": "Crystal Princess Luna Saç Testi"
+      },
+      "wiki_path": "Crystal_Princess_Luna_Hair_Test"
+    },
+    "Pony_Future_Ish_Stallion": {
+      "alt_name": {
+        "english": [
+          "Philip J. Fry"
+        ],
+        "arabic": [
+          "فراي"
+        ],
+        "chinese": [
+          "菲利普·J·弗莱"
+        ],
+        "french": [
+          "Philip J. Fry"
+        ],
+        "german": [
+          "Philip J. Fry"
+        ],
+        "italian": [
+          "Philip J. Fry"
+        ],
+        "korean": [
+          "필립 J. 프라이"
+        ],
+        "russian": [
+          "Филип Дж. Фрай"
+        ],
+        "turkish": [
+          "Philip J. Fry"
+        ]
+      }
+    },
+    "Pony_Nightmare_Trixie_UPD98": {
+      "wiki_path": "Nightmare_Trixie_(10.7)"
+    },
+    "Pony_Nightmare_Sunburst_UPD98": {
+      "wiki_path": "Nightmare_Sunburst_(10.7)"
+    },
+    "Pony_Jesus_Pezuna": {
+      "tags": [
+        "unused"
+      ]
+    },
+    "Pony_Bushel": {
+      "tags": [
+        "unused"
+      ]
+    },
+    "Pony_Bold_Archeologist": {
+      "alt_name": {
+        "english": ["Indiana Jones"]
+      }
+    },
+    "Pony_Vampire_Hunter_Sombra": {
+      "alt_name": {
+        "english": ["Van Helsing"]
+      }
+    },
+    "Pony_Bassist_Pony": {
+      "alt_name": {
+        "english": ["George Harrison"]
+      }
+    },
+    "Pony_Guitarist_Pony": {
+      "alt_name": {
+        "english": ["John Lennon"]
+      }
+    },
+    "Pony_Lead_Singer_Pony": {
+      "alt_name": {
+        "english": ["Paul McCartney"]
+      }
+    },
+    "Pony_Prancy_Drew": {
+      "alt_name": {
+        "english": [
+          "Nancy Drew",
+          "Velma"
+        ]
+      }
+    },
+    "Pony_Traveling_Gentlecolt": {
+      "alt_name": {
+        "english": [
+          "Neal Page"
+        ]
+      }
+    },
+    "Pony_Traveling_Pony": {
+      "alt_name": {
+        "english": [
+          "Del Griffith"
+        ]
+      }
+    },
+    "Pony_Maybelle": {
+      "alt_name": {
+        "english": [
+          "Mabel",
+          "Mabel Pines"
+        ]
+      }
+    },
+    "Pony_Maybelles_Twin_Brother": {
+      "alt_name": {
+        "english": [
+          "Dipper",
+          "Dipper Pines"
+        ]
+      }
+    },
+    "Pony_Feather_Bangs": {
+      "alt_name": {
+        "english": [
+          "Justin Bieber"
+        ]
+      }
+    },
+    "Pony_Songbird_Serenade": {
+      "alt_name": {
+        "english": [
+          "Sia"
+        ]
+      }
+    },
+    "Pony_Surrealist_Pony": {
+      "alt_name": {
+        "english": [
+          "Salvador Dalí"
+        ]
+      }
+    },
+    "Pony_Pop_Art_Pony": {
+      "alt_name": {
+        "english": [
+          "Andy Warhol"
+        ]
+      }
+    },
+    "Pony_Cubist_Pony": {
+      "alt_name": {
+        "english": [
+          "Pablo Picasso"
+        ]
+      }
+    },
+    "Pony_Head_Chef_Pony": {
+      "alt_name": {
+        "english": [
+          "Gordon Ramsay"
+        ]
+      }
+    },
+    "Pony_Minuette": {
+      "alt_name": {
+        "english": [
+          "Colgate"
+        ]
+      }
+    },
+    "Pony_Discount_Hunter_Mare": {
+      "alt_name": {
+        "english": [
+          "Whoa Nelly"
+        ]
       }
     }
   }
