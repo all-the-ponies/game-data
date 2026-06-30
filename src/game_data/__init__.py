@@ -14,7 +14,7 @@ import argcomplete
 from botocore.exceptions import ClientError
 import google_play_scraper as gplay
 
-from luna_kit.api import API
+from luna_kit.api import API, Version
 from luna_kit.typings import DLCManifest
 
 from .console import console
@@ -38,6 +38,7 @@ def build_cdn(
     overrides_dir: str | Path,
     skip: list[str] | None = None,
     ffdec: str = 'ffdec',
+    force: bool = False,
 ):
     if skip is None:
         skip = []
@@ -52,7 +53,7 @@ def build_cdn(
 
     notifier = Notifier()
 
-    if s3_client and version == 'latest':
+    if s3_client and (version == 'latest' or force):
         last_version: str | None = None
         try:
             version_file = s3_client.get_object(
@@ -68,14 +69,17 @@ def build_cdn(
                 console.print('Could not get current version')
         
         app_info = gplay.app(PACKAGE_NAME)
-        latest_version = app_info['version']
+        if version == 'latest':
+            latest_version = app_info['version']
+        else:
+            latest_version = version
 
         notifier.version = latest_version
         notifier.release_notes = app_info['recentChanges']
         notifier.app_icon = app_info['icon']
 
         version = latest_version
-        if not last_version or latest_version != last_version:
+        if not last_version or Version.parse(latest_version) > Version.parse(last_version):
             console.print(f'New app version found: [yellow]{latest_version}[/]')
             notifier.notify('app')
         else:
@@ -231,6 +235,13 @@ def create_argparser():
     )
 
 
+    build.add_argument(
+        '-f', '--force',
+        dest = 'force',
+        action = 'store_true',
+        help = 'Force update and notification',
+    )
+
     
     upload = command.add_parser(
         'upload',
@@ -276,6 +287,7 @@ def main() -> None:
                 overrides_dir = args.overrides,
                 skip = args.skip,
                 ffdec = args.ffdec,
+                force = args.force,
             )
     
             peak_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
