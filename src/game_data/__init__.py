@@ -12,11 +12,11 @@ import shutil
 from PIL import Image
 import argcomplete
 from botocore.exceptions import ClientError
-import google_play_scraper as gplay
 
 from luna_kit.api import API, Version
 from luna_kit.typings import DLCManifest
 
+from .app_info import get_app_info
 from .console import console
 from .crop import crop_image
 from .downloader import download
@@ -26,8 +26,6 @@ from .notify import Notifier
 from .s3 import BUCKET, get_s3_client
 from .sync import sync, upload_file
 from .transformer import Transformer
-
-PACKAGE_NAME = "com.gameloft.android.ANMP.GloftPOHM"
 
 
 def build_cdn(
@@ -68,15 +66,15 @@ def build_cdn(
             except:
                 console.print('Could not get current version')
         
-        app_info = gplay.app(PACKAGE_NAME)
+        app_info = get_app_info()
         if version == 'latest':
-            latest_version = app_info['version']
+            latest_version = app_info.version
         else:
             latest_version = version
 
         notifier.version = latest_version
-        notifier.release_notes = app_info['recentChanges']
-        notifier.app_icon = app_info['icon']
+        notifier.release_notes = app_info.release_notes
+        notifier.app_icon = app_info.icon_url
 
         version = latest_version
         if not last_version or Version.parse(latest_version) > Version.parse(last_version):
