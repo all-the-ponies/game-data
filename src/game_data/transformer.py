@@ -1001,6 +1001,9 @@ class Transformer:
                 token_info.special = token.get('Other', {}).get('SpecialCaseID', 0)
 
                 for task in token_info.tasks:
+                    if task not in self.game_data.tasks_data.tasks:
+                        continue
+                    
                     task_overrides = self.defaultGameCampaign['game_object_data']['QuestSpecialItem'].get(token.id, {}).get('PonyTasksOverride', {}).get(task, {})
                     
                     self.game_data.tasks_data.tasks[task].reward.token = token.id
