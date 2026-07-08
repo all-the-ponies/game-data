@@ -3,16 +3,24 @@ import numpy as np
 
 def crop_image(pil_image: Image.Image):
     # pil_image = Image.open(pil_image)
-    pil_image = pil_image.convert('RGBA')
+    if pil_image.mode != 'RGBA':
+        pil_image = pil_image.convert('RGBA')
     np_array = np.array(pil_image)
-    alpha = pil_image.getchannel('A')
-    alpha_array = np.array(alpha)
+    alpha_array =  np_array[:, :, 3]
     
     mask: np.typing.NDArray = alpha_array >= 25
     
-    coords = np.argwhere(mask)
-    x0, y0 = coords.min(axis=0)
-    x1, y1 = coords.max(axis=0) + 1
+    rows = np.any(mask, axis=1)
+    cols = np.any(mask, axis=0)
+
+    if not rows.any():
+        # fully transparent, nothing to crop
+        return pil_image
+
+    row_idx = np.where(rows)[0]
+    col_idx = np.where(cols)[0]
+    x0, x1 = row_idx[0], row_idx[-1] + 1
+    y0, y1 = col_idx[0], col_idx[-1] + 1
 
     cropped_box = np_array[x0:x1, y0:y1]
     pil_image = Image.fromarray(cropped_box)

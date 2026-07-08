@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import resource
 import shutil
+from time import perf_counter
 
 from PIL import Image
 import argcomplete
@@ -38,6 +39,8 @@ def build_cdn(
     ffdec: str = 'ffdec',
     force: bool = False,
 ):
+    start_time = perf_counter()
+
     if skip is None:
         skip = []
 
@@ -158,6 +161,8 @@ def build_cdn(
             )
         except:
             console.print('[red]Failed to save dlc_manifest[/]')
+    
+    console.log(f'Time: {(perf_counter() - start_time) / 60:.2f}m')
     
 
 def create_argparser():

@@ -1,3 +1,4 @@
+from concurrent.futures import Future, ProcessPoolExecutor, ThreadPoolExecutor
 from dataclasses import dataclass, field
 from glob import glob
 import json
@@ -137,6 +138,22 @@ def find_in_sprite(sprite: str | Path, frame: str):
     return match.group()
 
 
+
+def _transform_image(src: str | Path, dest: str | Path):
+    src = Path(src)
+    
+    if src.suffix == '.pvr':
+        image = PVR(src).image
+    else:
+        image = Image.open(src)
+    
+    if image is not None:
+        image = crop_image(image)
+        image.save(dest)
+    else:
+        console.print(f'[red]Could not load {src}[/]')
+
+
 class Transformer:
     game_data: GameData
     
@@ -189,8 +206,12 @@ class Transformer:
 
         self.pony_houses: dict[str, list[str]] = {}
 
+        self._image_executor = ThreadPoolExecutor()
+        self._image_process_executor = ProcessPoolExecutor()
+        self._image_futures: list[Future] = []
+
     def start(self):
-        self.get_game_objects()
+        self.get_game_data()
 
     def save(self):
         console.log('Saving files')
@@ -207,31 +228,50 @@ class Transformer:
         with open(self.output_folder/'collection_data.json', 'w', encoding = 'utf-8') as file:
             file.write(self.game_data.collection_data.model_dump_json(ensure_ascii = False, indent = 2))
     
-    def get_game_objects(self):
-        self.get_category_pony()
-        self.get_category_house()
-        self.get_category_decor()
-        self.get_category_avatar()
-        self.get_category_avatar_frame()
-        self.get_category_background()
-        self.get_category_background_frame()
-        self.get_category_cutie_mark()
-        self.get_category_pet()
-        self.get_category_theme()
-        self.get_category_path()
-        self.get_category_item()
-        self.get_category_booster()
-        self.get_tasks()
-        self.get_category_token()
-        self.get_category_consumable()
-        self.get_category_costume()
-        self.get_category_costume_part()
+    def get_game_data(self):
+        try:
+            self.get_category_pony()
+            self.get_category_house()
+            self.get_category_decor()
+            self.get_category_avatar()
+            self.get_category_avatar_frame()
+            self.get_category_background()
+            self.get_category_background_frame()
+            self.get_category_cutie_mark()
+            self.get_category_pet()
+            self.get_category_theme()
+            self.get_category_path()
+            self.get_category_item()
+            self.get_category_booster()
+            self.get_tasks()
+            self.get_category_token()
+            self.get_category_consumable()
+            self.get_category_costume()
+            self.get_category_costume_part()
 
-        self.get_group_quests()
-        self.get_fortune_shop()
-        self.get_collections()
+            self.get_group_quests()
+            self.get_fortune_shop()
+            self.get_collections()
 
-        self.apply_overrides()
+            self.apply_overrides()
+
+            self.wait_for_images()
+        except:
+            self._image_executor.shutdown(wait = True, cancel_futures = True)
+            self._image_process_executor.shutdown(wait = True, cancel_futures = True)
+            raise
+        finally:
+            self._image_executor.shutdown(wait = True)
+            self._image_process_executor.shutdown(wait = True)
+    
+    def wait_for_images(self):
+        if len(self._image_futures) == 0:
+            return
+        
+        for future in track(self._image_futures, description = 'Finishing image processing...'):
+            future.result()
+        
+        self._image_futures.clear()
     
     def apply_overrides(self):
         if not (self.override_folder/'game_objects.json').exists():
@@ -278,7 +318,7 @@ class Transformer:
         )):
             try:
                 shop_data = self.gameObjectData.get_object_shopdata(pony.id)
-                pony_info = PonyType(
+                pony_info = PonyType.model_construct(
                     index = index,
                     id = pony.id,
                     name = self.translate_string(pony.get('Name', {}).get('Unlocal', pony.id)),
@@ -353,7 +393,7 @@ class Transformer:
                     pony.get('StarRewards', {}).get('ID', []),
                     pony.get('StarRewards', {}).get('Amount', []),
                 ):
-                    pony_info.rewards.append(StarReward(
+                    pony_info.rewards.append(StarReward.model_construct(
                         item = prize_id,
                         amount = amount,
                     ))
@@ -418,11 +458,10 @@ class Transformer:
 
                 house_class = ShopType if is_shop else HouseType
 
-                house_info = house_class(
+                house_info = house_class.model_construct(
                     index = index['shop' if is_shop else 'house'],
                     id = house.id,
                     name = self.translate_string(house.get('Name', {}).get('Unlocal', house.id)),
-
                 )
                 index[house_info.category] += 1
 
@@ -512,7 +551,7 @@ class Transformer:
         )):
             try:
                 shop_data = self.gameObjectData.get_object_shopdata(decor.id)
-                decor_info = DecorType(
+                decor_info = DecorType.model_construct(
                     index = index,
                     id = decor.id,
                     name = self.translate_string(decor.get('Name', {}).get('Unlocal', decor.id)),
@@ -571,7 +610,7 @@ class Transformer:
             description = 'Getting avatars...',
         )):
             try:
-                avatar_info = AvatarType(
+                avatar_info = AvatarType.model_construct(
                     index = index,
                     id = avatar.id,
                     name = self.translate_string(avatar.get('Shop', {}).get('Label', avatar.id)),
@@ -624,7 +663,7 @@ class Transformer:
             description = 'Getting frames...',
         )):
             try:
-                frame_info = AvatarFrameType(
+                frame_info = AvatarFrameType.model_construct(
                     index = index,
                     id = frame.id,
                     name = self.translate_string(frame.get('Shop', {}).get('Label', frame.id)),
@@ -722,7 +761,7 @@ class Transformer:
             description = 'Getting background frames...',
         )):
             try:
-                frame_info = BackgroundFrameType(
+                frame_info = BackgroundFrameType.model_construct(
                     index = index,
                     id = frame.id,
                     name = self.translate_string(frame.get('Shop', {}).get('Label', frame.id)),
@@ -756,7 +795,7 @@ class Transformer:
             description = 'Getting cutie marks...',
         )):
             try:
-                cutie_mark_info = CutieMarkType(
+                cutie_mark_info = CutieMarkType.model_construct(
                     index = index,
                     id = cutie_mark.id,
                     name = self.translate_string(cutie_mark.get('Shop', {}).get('Label', cutie_mark.id)),
@@ -791,7 +830,7 @@ class Transformer:
             description = 'Getting pets...',
         )):
             try:
-                pet_info = PetType(
+                pet_info = PetType.model_construct(
                     index = index,
                     id = pet.id,
                     name = self.translate_string(pet.get('Name', {}).get('Unlocal', pet.id)),
@@ -830,7 +869,7 @@ class Transformer:
             description = 'Getting themes...',
         )):
             try:
-                theme_info = ThemeType(
+                theme_info = ThemeType.model_construct(
                     index = index,
                     id = theme.id,
                     name = self.translate_string(theme.get('Appearance', {}).get('Name', theme.id)),
@@ -871,7 +910,7 @@ class Transformer:
             description = 'Getting paths...',
         )):
             try:
-                path_info = PathType(
+                path_info = PathType.model_construct(
                     index = index,
                     id = path.id,
                     name = self.translate_string(path.get('Name', {}).get('Unlocal', path.id)),
@@ -909,7 +948,7 @@ class Transformer:
             description = 'Getting items...',
         )):
             try:
-                item_info = ItemType(
+                item_info = ItemType.model_construct(
                     index = index,
                     id = id,
                     name = self.translate_string(item['loc_string']),
@@ -941,7 +980,7 @@ class Transformer:
             description = 'Getting boosters...',
         )):
             try:
-                booster_info = BoosterType(
+                booster_info = BoosterType.model_construct(
                     index = index,
                     id = booster.id,
                     name = self.translate_string(booster.get('Shop', {}).get('Label', booster.id)),
@@ -980,7 +1019,7 @@ class Transformer:
             description = 'Getting tokens...',
         )):
             try:
-                token_info = TokenType(
+                token_info = TokenType.model_construct(
                     index = index,
                     id = token.id,
                     name = self.translate_string(token.get('QuestSpecialItem', {}).get('Name', token.id)),
@@ -1030,7 +1069,7 @@ class Transformer:
             description = 'Getting consumables...',
         )):
             try:
-                consumable_info = ConsumableType(
+                consumable_info = ConsumableType.model_construct(
                     index = index,
                     id = consumable.id,
                     name = self.translate_string(consumable.get('Name', {}).get('Unlocal', consumable.id)),
@@ -1054,13 +1093,13 @@ class Transformer:
 
                 if consumable.get('Farm', {}).get('LessButtonType', None) is not None:
                     consumable_info.farm = [
-                        FarmCost(
+                        FarmCost.model_construct(
                             shard = consumable.get('Farm', {}).get('LessButtonType', ''),
                             shard_cost = consumable.get('Farm', {}).get('LessButtonTypeCost', 0),
                             item = 'Bits',
                             item_cost = consumable.get('Farm', {}).get('LessButtonCoinsCost', 0),
                         ),
-                        FarmCost(
+                        FarmCost.model_construct(
                             shard = consumable.get('Farm', {}).get('MoreButtonType', ''),
                             shard_cost = consumable.get('Farm', {}).get('MoreButtonTypeCost', 0),
                             item = 'Gems',
@@ -1069,7 +1108,7 @@ class Transformer:
                     ]
                 
                 if consumable.get('AnimalHouse', {}).get('MainFeedType', None) is not None:
-                    consumable_info.critter = ConsumableCritter(
+                    consumable_info.critter = ConsumableCritter.model_construct(
                         critter = consumable.get('AnimalHouse', {}).get('AnimalID', ''),
                         main_feed = consumable.get('AnimalHouse', {}).get('MainFeedType', ''),
                         additional_feed = consumable.get('AnimalHouse', {}).get('AdditionalFeedType', ''),
@@ -1087,7 +1126,7 @@ class Transformer:
                                 'additional': consumable.get('AnimalHouse', {}).get('FinalAdditionalFeed', 0),
                             },
                         ],
-                        upgrade = CritterUpgrade(
+                        upgrade = CritterUpgrade.model_construct(
                             currency = CURRENCY.get(
                                 consumable.get('AnimalHouse', {}).get('UpgradeCurrencyType', 1),
                                 'Bits',
@@ -1132,7 +1171,7 @@ class Transformer:
             description = 'Getting costumes...',
         )):
             try:
-                costume_info = CostumeType(
+                costume_info = CostumeType.model_construct(
                     index = index,
                     id = costume.id,
                     name = self.translate_string(costume.get('PonySet', {}).get('Localization', costume.id)),
@@ -1209,7 +1248,7 @@ class Transformer:
             description = 'Getting costume part...',
         )):
             try:
-                costume_part_info = CostumePartType(
+                costume_part_info = CostumePartType.model_construct(
                     index = index,
                     id = costume_part.id,
                 )
@@ -1252,7 +1291,7 @@ class Transformer:
             group_quest_data: GroupQuestsType = json.load(file)
         
         for id, quest_data in group_quest_data.items():
-            quest_info = QuestDetail(
+            quest_info = QuestDetail.model_construct(
                 name = self.translate_string(quest_data['Name']),
                 description = self.translate_string(quest_data['Description']),
             )
@@ -1307,7 +1346,7 @@ class Transformer:
                     id = item['id'],
                     rarity = rarity,
                     amount = item.get('amount', 1),
-                    prices = FortuneShopItemPricesList(
+                    prices = FortuneShopItemPricesList.model_construct(
                         regular = dict(zip(price_names, item['price_list'])),
                         royal = dict(zip(price_names, item.get('sub_price_list', []))),
                     )
@@ -1321,7 +1360,7 @@ class Transformer:
         task_icons.mkdir(parents = True, exist_ok = True)
         
         for index, task in enumerate(track(ponytasks['PonyTasks'], description = 'Getting tasks...')):
-            task_info = TaskEntry(
+            task_info = TaskEntry.model_construct(
                 id = task['ID'],
                 index = index,
                 name = self.translate_string(task['LocalizedName']),
@@ -1390,12 +1429,12 @@ class Transformer:
             try:
                 items = list[str]()
                 fashion_show_items = list[FashionShowItem]()
-                rewards = CollectionReward()
+                rewards = CollectionReward.model_construct()
 
                 for child in collection_el:
                     if child.tag == 'Rewards':
                         for reward_el in child:
-                            sub_reward = CollectionRewardEntry(
+                            sub_reward = CollectionRewardEntry.model_construct(
                                 item = reward_el.get('objectId') or '',
                                 amount = strToInt(reward_el.get('objectAmount'), 0),
                             )
@@ -1412,7 +1451,7 @@ class Transformer:
                             part_set = child.find('RequiredPartSet')
 
                             if part_set is not None:
-                                entry = FashionShowItem(pony = item_id)
+                                entry = FashionShowItem.model_construct(pony = item_id)
 
                                 for part in part_set:
                                     if part.tag == 'part':
@@ -1421,7 +1460,7 @@ class Transformer:
                                 fashion_show_items.append(entry)
                 
                 if len(fashion_show_items):
-                    fashion_show[collection_id] = FashionShowEntry(
+                    fashion_show[collection_id] = FashionShowEntry.model_construct(
                         index = index['fashion_show'],
                         id = collection_id,
                         name = self.translate_string(collection_el.attrib.get('locString', collection_id)),
@@ -1431,7 +1470,7 @@ class Transformer:
                     
                     index['fashion_show'] += 1
                 else:
-                    collections[collection_id] = CollectionEntry(
+                    collections[collection_id] = CollectionEntry.model_construct(
                         index = index['collection'],
                         id = collection_id,
                         name = self.translate_string(collection_el.attrib.get('locString', collection_id)),
@@ -1456,8 +1495,8 @@ class Transformer:
     
     def add_image(self, game_paths: list[str], dest: str | Path) -> RenamedFile:
         used_game_name: str | None = None
+        used_filename: str | Path | None = None
         dest = Path(dest)
-        image: Image.Image | None = None
 
         source_paths = set[str]()
         for path in game_paths:
@@ -1472,45 +1511,50 @@ class Transformer:
             name = os.path.splitext(filename)[0]
 
             if os.path.exists(self.game_folder/(name + '.png')):
-                image = Image.open(self.game_folder/(name + '.png'))
+                used_filename = self.game_folder/(name + '.png')
             elif os.path.exists(self.game_folder/(name + '.pvr')):
-                image = PVR(self.game_folder/(name + '.pvr')).image
+                used_filename = self.game_folder/(name + '.pvr')
             else:
                 found_paths = list(self.game_folder.glob(name + '.*', case_sensitive = False))
                 if len(found_paths):
                     for path in found_paths:
-                        if path.suffix == '.png':
-                            image = Image.open(path)
-                            break
-                        if path.suffix == '.pvr' and '.alpha' not in path.name:
-                            image = PVR(path).image
+                        if path.suffix == '.png' or (path.suffix == '.pvr' and '.alpha' not in path.name):
+                            used_filename = path
                             break
 
-            if image is not None:
+            if used_filename is not None:
                 used_game_name = filename
                 break
         
         rel_path = dest.relative_to(self.output_folder).as_posix()
         
-        if image is not None:
-            image = crop_image(image)
-            image.save(dest)
+        if used_filename is not None:
+            future = self._image_process_executor.submit(_transform_image, used_filename, dest)
+            self._image_futures.append(future)
         else:
             console.print(f'[red]Could not find {game_paths}, {rel_path}[/]')
         
-        return RenamedFile(path = rel_path, original = used_game_name)
+        return RenamedFile.model_construct(path = rel_path, original = used_game_name)
     
     def add_animated_image(self, game_path: str, dest: str | Path) -> RenamedFile:
         if os.path.exists(self.game_folder/game_path):
-            swf2webp(self.game_folder/game_path, dest, console = console, ffdec_path = self.ffdec)
+
+            future = self._image_executor.submit(
+                swf2webp,
+                self.game_folder/game_path,
+                dest,
+                console = console,
+                ffdec_path = self.ffdec,
+            )
+            self._image_futures.append(future)
         
-        return RenamedFile(
+        return RenamedFile.model_construct(
             path = Path(dest).relative_to(self.output_folder).as_posix(),
             original = game_path,
         )
     
     def get_price(self, shopdata: ShopItem):
-        price = Price()
+        price = Price.model_construct()
 
         price.base.currency = CURRENCY.get(shopdata.get('CurrencyType', 0))
         price.base.amount = shopdata.get('Cost', 0)
