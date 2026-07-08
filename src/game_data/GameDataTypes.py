@@ -98,6 +98,7 @@ class PonyType(GenericObjectType):
     pro: list[str] = Field(default_factory = list)
     collections: list[str] = Field(default_factory = list)
     costumes: list[GameObjectId] = Field(default_factory = list)
+    critter_farm: GameObjectId | None = None
     wiki_path: str = ''
 
 class HouseBuild(BaseModel):
@@ -413,11 +414,16 @@ class CollectionReward(BaseModel):
     main: CollectionRewardEntry = Field(default_factory = CollectionRewardEntry)
     alt: CollectionRewardEntry = Field(default_factory = CollectionRewardEntry)
 
+class CollectionItem(BaseModel):
+    item: GameObjectId
+    alt: GameObjectId | None = None
+    count: int = 1
+
 class CollectionEntry(BaseModel):
     index: int
     id: str
     name: TranslatableString
-    ponies: list[GameObjectId]
+    ponies: list[CollectionItem]
     reward: CollectionReward
 
 class FashionShowItem(BaseModel):

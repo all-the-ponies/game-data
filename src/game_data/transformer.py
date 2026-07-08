@@ -230,6 +230,7 @@ class Transformer:
     def get_game_data(self):
         try:
             self.get_category_pony()
+            self.get_category_consumable()
             self.get_category_house()
             self.get_category_decor()
             self.get_category_avatar()
@@ -244,7 +245,6 @@ class Transformer:
             self.get_category_booster()
             self.get_tasks()
             self.get_category_token()
-            self.get_category_consumable()
             self.get_category_costume()
             self.get_category_costume_part()
 
@@ -491,7 +491,7 @@ class Transformer:
                 visitors = [visitor for visitor in house.get('Visitors', {}).get('Ponies', []) if visitor]
 
                 for visitor in visitors:
-                    if not visitor in self.game_data.game_objects.pony.objects:
+                    if visitor not in self.game_data.game_objects.pony.objects:
                         if visitor:
                             console.log(f'house {house.id} has nonexistent visitor "{visitor}"')
                         continue
@@ -522,6 +522,13 @@ class Transformer:
                         house_info.special = 'ferris_wheel'
                     else:
                         house_info.product = house.get('ShopModule', {}).get('Consumable_A', '')
+                        
+                        consumable = self.game_data.game_objects.consumable.objects.get(house_info.product)
+                        if consumable is not None and consumable.critter is not None:
+                            critter = self.game_data.game_objects.pony.objects.get(consumable.critter.critter)
+                            if critter is not None:
+                                critter.critter_farm = house.id
+                                self.game_data.game_objects.pony.objects[critter.changeling.id].critter_farm = house.id
                     
                     house_info.can_sell = house.get('Sell', {}).get('CanSell', False)
 
@@ -1424,8 +1431,8 @@ class Transformer:
         ):
             collection_id = collection_el.attrib['collectionId']
             try:
-                items = list[str]()
-                fashion_show_items = list[FashionShowItem]()
+                items: list[CollectionItem] = []
+                fashion_show_items: list[FashionShowItem] = []
                 rewards = CollectionReward.model_construct()
 
                 for child in collection_el:
@@ -1443,7 +1450,12 @@ class Transformer:
                     elif child.tag == 'CollectionItem':
                         item_id = child.get('itemId')
                         if item_id:
-                            items.append(item_id)
+                            item = CollectionItem(
+                                item = item_id,
+                                alt = child.get('DuplItemId'),
+                                count = strToInt(child.get('itemNum'), 1),
+                            )
+                            items.append(item)
 
                             part_set = child.find('RequiredPartSet')
 
@@ -1477,14 +1489,15 @@ class Transformer:
                     
                     index['collection'] += 1
 
-                    for pony_id in items:
-                        if pony_id not in self.game_data.game_objects.pony.objects:
+                    for item in items:
+                        if item.item not in self.game_data.game_objects.pony.objects:
                             continue
-                        self.game_data.game_objects.pony.objects[pony_id].collections.append(collection_id)
+                        self.game_data.game_objects.pony.objects[item.item].collections.append(collection_id)
                 
 
             except Exception as e:
                 e.add_note(f'Collections: {collection_id}')
+                console.print_exception()
 
     
     def translate_string(self, key: str) -> TranslatableString:
