@@ -403,3 +403,34 @@ class TaskEntry(BaseModel):
 
 class TasksData(BaseModel):
     tasks: dict[str, TaskEntry] = Field(default_factory = dict)
+
+
+class CollectionRewardEntry(BaseModel):
+    item: GameObjectId = ''
+    amount: int = 0
+
+class CollectionReward(BaseModel):
+    main: CollectionRewardEntry = Field(default_factory = CollectionRewardEntry)
+    alt: CollectionRewardEntry = Field(default_factory = CollectionRewardEntry)
+
+class CollectionEntry(BaseModel):
+    index: int
+    id: str
+    name: TranslatableString
+    ponies: list[GameObjectId]
+    reward: CollectionReward
+
+class FashionShowItem(BaseModel):
+    pony: GameObjectId
+    parts: list[GameObjectId] = Field(default_factory = list)
+
+class FashionShowEntry(BaseModel):
+    index: int
+    id: str
+    name: TranslatableString
+    items: list[FashionShowItem]
+    reward: CollectionReward
+
+class CollectionData(BaseModel):
+    collections: dict[str, CollectionEntry] = Field(default_factory = dict)
+    fashion_show: dict[str, FashionShowEntry] = Field(default_factory = dict)

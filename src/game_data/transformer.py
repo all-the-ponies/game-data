@@ -36,6 +36,7 @@ class GameData:
     group_quests: GroupQuests = field(default_factory = GroupQuests)
     fortune_shop: FortuneShop = field(default_factory = FortuneShop)
     tasks_data: TasksData = field(default_factory = TasksData)
+    collection_data: CollectionData = field(default_factory = CollectionData)
 
 class ObjectOverride(TypedDict):
     preferred_name: TranslatableString
@@ -203,6 +204,8 @@ class Transformer:
             file.write(self.game_data.fortune_shop.model_dump_json(ensure_ascii = False, indent = 2))
         with open(self.output_folder/'tasks_data.json', 'w', encoding = 'utf-8') as file:
             file.write(self.game_data.tasks_data.model_dump_json(ensure_ascii = False, indent = 2))
+        with open(self.output_folder/'collection_data.json', 'w', encoding = 'utf-8') as file:
+            file.write(self.game_data.collection_data.model_dump_json(ensure_ascii = False, indent = 2))
     
     def get_game_objects(self):
         self.get_category_pony()
@@ -226,6 +229,7 @@ class Transformer:
 
         self.get_group_quests()
         self.get_fortune_shop()
+        self.get_collections()
 
         self.apply_overrides()
     
@@ -1366,6 +1370,85 @@ class Transformer:
                 task_info.reward.gems = task['RewardGems']
             if 'Duration' in task:
                 task_info.duration = task['Duration']
+    
+    def get_collections(self):
+        collections = self.game_data.collection_data.collections
+        fashion_show = self.game_data.collection_data.fashion_show
+
+        raw_collection_data = parse_xml(self.game_folder/'collectionData.xml')[0][0]
+
+        index: dict[Literal['collection', 'fashion_show'], int] = {
+            'collection': 0,
+            'fashion_show': 0,
+        }
+
+        for collection_el in track(
+            raw_collection_data,
+            description = 'Getting collections...'
+        ):
+            collection_id = collection_el.attrib['collectionId']
+            try:
+                items = list[str]()
+                fashion_show_items = list[FashionShowItem]()
+                rewards = CollectionReward()
+
+                for child in collection_el:
+                    if child.tag == 'Rewards':
+                        for reward_el in child:
+                            sub_reward = CollectionRewardEntry(
+                                item = reward_el.get('objectId') or '',
+                                amount = strToInt(reward_el.get('objectAmount'), 0),
+                            )
+                            if reward_el.tag == 'Reward':
+                                rewards.main = sub_reward
+                            elif reward_el.tag == 'AltReward':
+                                rewards.alt = sub_reward
+
+                    elif child.tag == 'CollectionItem':
+                        item_id = child.get('itemId')
+                        if item_id:
+                            items.append(item_id)
+
+                            part_set = child.find('RequiredPartSet')
+
+                            if part_set is not None:
+                                entry = FashionShowItem(pony = item_id)
+
+                                for part in part_set:
+                                    if part.tag == 'part':
+                                        entry.parts.append(part.attrib.get('id', ''))
+                                
+                                fashion_show_items.append(entry)
+                
+                if len(fashion_show_items):
+                    fashion_show[collection_id] = FashionShowEntry(
+                        index = index['fashion_show'],
+                        id = collection_id,
+                        name = self.translate_string(collection_el.attrib.get('locString', collection_id)),
+                        reward = rewards,
+                        items = fashion_show_items,
+                    )
+                    
+                    index['fashion_show'] += 1
+                else:
+                    collections[collection_id] = CollectionEntry(
+                        index = index['collection'],
+                        id = collection_id,
+                        name = self.translate_string(collection_el.attrib.get('locString', collection_id)),
+                        reward = rewards,
+                        ponies = items,
+                    )
+                    
+                    index['collection'] += 1
+
+                    for pony_id in items:
+                        if pony_id not in self.game_data.game_objects.pony.objects:
+                            continue
+                        self.game_data.game_objects.pony.objects[pony_id].collections.append(collection_id)
+                
+
+            except Exception as e:
+                e.add_note(f'Collections: {collection_id}')
 
     
     def translate_string(self, key: str) -> TranslatableString:
