@@ -1,4 +1,4 @@
-from concurrent.futures import Future, ProcessPoolExecutor, ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass, field
 from glob import glob
 import json
@@ -207,7 +207,6 @@ class Transformer:
         self.pony_houses: dict[str, list[str]] = {}
 
         self._image_executor = ThreadPoolExecutor()
-        self._image_process_executor = ProcessPoolExecutor()
         self._image_futures: list[Future] = []
 
     def start(self):
@@ -258,11 +257,9 @@ class Transformer:
             self.wait_for_images()
         except:
             self._image_executor.shutdown(wait = True, cancel_futures = True)
-            self._image_process_executor.shutdown(wait = True, cancel_futures = True)
             raise
         finally:
             self._image_executor.shutdown(wait = True)
-            self._image_process_executor.shutdown(wait = True)
     
     def wait_for_images(self):
         if len(self._image_futures) == 0:
@@ -1529,7 +1526,7 @@ class Transformer:
         rel_path = dest.relative_to(self.output_folder).as_posix()
         
         if used_filename is not None:
-            future = self._image_process_executor.submit(_transform_image, used_filename, dest)
+            future = self._image_executor.submit(_transform_image, used_filename, dest)
             self._image_futures.append(future)
         else:
             console.print(f'[red]Could not find {game_paths}, {rel_path}[/]')
