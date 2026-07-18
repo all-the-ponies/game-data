@@ -1,10 +1,10 @@
+from concurrent.futures import Future, ThreadPoolExecutor
 import ctypes
 import ctypes.util
 import os
 from pathlib import Path
 import math
 import shutil
-from typing import Literal
 
 import cairo
 import gi
@@ -63,6 +63,9 @@ class CollectionImageGenerator:
 
         self.load_fonts()
 
+        self.image_encode_threader = ThreadPoolExecutor()
+        self.image_futures: list[Future] = []
+
         self.template = cairo.ImageSurface.create_from_png(self.TEMPLATE_PATH)
         self.create_images()
 
@@ -75,21 +78,35 @@ class CollectionImageGenerator:
     
 
     def create_images(self):
-        for collection in track(
-            self.game_data.collection_data.collections.values(),
-            description = 'Generating collection images...',
-        ):
-            self.draw_collection(collection)
+        try:
+            for collection in track(
+                self.game_data.collection_data.collections.values(),
+                description = 'Generating collection images...',
+            ):
+                self.draw_collection(collection)
+
+            for future in track(self.image_futures, description = 'Finishing writing files'):
+                future.result()
+            
+        except KeyboardInterrupt:
+            self.image_encode_threader.shutdown(cancel_futures = True, wait = True)
+            raise
+        finally:
+            self.image_encode_threader.shutdown(wait = True)
+        
     
 
     def draw_collection(self, collection: CollectionEntry):
         base_surface = self.draw_collection_base(collection)
         width, height = base_surface.get_width(), base_surface.get_height()
 
+        reward = self.game_data.get_object(collection.reward.main.item)
+
         for language in collection.name:
             surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
             ctx = cairo.Context(surface)
 
+            ctx.set_operator(cairo.OPERATOR_SOURCE)
             ctx.set_source_surface(base_surface)
             ctx.paint()
 
@@ -113,7 +130,6 @@ class CollectionImageGenerator:
                 shadow_offset = (0, 3),
             )
 
-            reward = self.game_data.get_object(collection.reward.main.item)
             if reward is not None:
                 self.draw_text(
                     ctx,
@@ -133,8 +149,8 @@ class CollectionImageGenerator:
             output.parent.mkdir(parents = True, exist_ok = True)
 
             collection.image[language] = output.relative_to(self.dist_folder).as_posix()
-
-            surface.write_to_png(output)
+            
+            self.image_futures.append(self.image_encode_threader.submit(surface.write_to_png, output))
         
         base_surface.finish()
     
@@ -143,6 +159,7 @@ class CollectionImageGenerator:
 
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
         ctx = cairo.Context(surface)
+        ctx.set_operator(cairo.OPERATOR_SOURCE)
         ctx.set_source_surface(self.template, 0, 0)
         ctx.paint()
 
