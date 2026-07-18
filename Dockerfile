@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     python3-dev \
     libgirepository-2.0-dev \
+    gir1.2-pango-1.0 \
+    libpango1.0-dev \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
