@@ -5,6 +5,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     curl \
     unzip \
+    libcairo2-dev \
+    pkg-config \
+    python3-dev \
+    libgirepository-2.0-dev \
+    gcc \
     && rm -rf /var/lib/apt/lists/*
 
 ENV UV_INSTALL_DIR=/usr/local/bin

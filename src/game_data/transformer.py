@@ -30,15 +30,6 @@ from .crop import crop_image
 from .utils import strToInt
 
 
-@dataclass
-class GameData:
-    game_version: GameVersion = field(default_factory = GameVersion)
-    game_objects: GameObjects = field(default_factory = GameObjects)
-    group_quests: GroupQuests = field(default_factory = GroupQuests)
-    fortune_shop: FortuneShop = field(default_factory = FortuneShop)
-    tasks_data: TasksData = field(default_factory = TasksData)
-    collection_data: CollectionData = field(default_factory = CollectionData)
-
 class ObjectOverride(TypedDict):
     preferred_name: TranslatableString
     alt_name: AltName
@@ -214,18 +205,7 @@ class Transformer:
 
     def save(self):
         console.log('Saving files')
-        with open(self.output_folder/'game_version.json', 'w', encoding = 'utf-8') as file:
-            file.write(self.game_data.game_version.model_dump_json(ensure_ascii = False))
-        with open(self.output_folder/'game_objects.json', 'w', encoding = 'utf-8') as file:
-            file.write(self.game_data.game_objects.model_dump_json(ensure_ascii = False, indent = 2))
-        with open(self.output_folder/'group_quests.json', 'w', encoding = 'utf-8') as file:
-            file.write(self.game_data.group_quests.model_dump_json(ensure_ascii = False, indent = 2))
-        with open(self.output_folder/'fortune_shop.json', 'w', encoding = 'utf-8') as file:
-            file.write(self.game_data.fortune_shop.model_dump_json(ensure_ascii = False, indent = 2))
-        with open(self.output_folder/'tasks_data.json', 'w', encoding = 'utf-8') as file:
-            file.write(self.game_data.tasks_data.model_dump_json(ensure_ascii = False, indent = 2))
-        with open(self.output_folder/'collection_data.json', 'w', encoding = 'utf-8') as file:
-            file.write(self.game_data.collection_data.model_dump_json(ensure_ascii = False, indent = 2))
+        self.game_data.save(self.output_folder)
     
     def get_game_data(self):
         try:

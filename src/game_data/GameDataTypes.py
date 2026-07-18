@@ -1,14 +1,6 @@
-from typing import (
-    Any,
-    Any,
-    Literal,
-    NotRequired,
-    Optional,
-    TYPE_CHECKING,
-    TypeVar,
-    TypeVarTuple,
-    TypedDict,
-)
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -349,6 +341,8 @@ CATEGORY_NAMES: list[CategoryName] = [
     'costume_part',
 ]
 
+type GameObject = PonyType | HouseType | ShopType | DecorType | AvatarType | AvatarFrameType | BackgroundType | BackgroundFrameType | CutieMarkType | PetType | ThemeType | PathType | ItemType | BoosterType | TokenType | ConsumableType | CostumeType | CostumePartType
+
 class GameObjects(BaseModel):
     pony: CategoryData[PonyType] = Field(default_factory = CategoryData[PonyType])
     house: CategoryData[HouseType] = Field(default_factory = CategoryData[HouseType])
@@ -425,6 +419,7 @@ class CollectionEntry(BaseModel):
     name: TranslatableString
     ponies: list[CollectionItem]
     reward: CollectionReward
+    image: TranslatableString = Field(default_factory = dict)
 
 class FashionShowItem(BaseModel):
     pony: GameObjectId
@@ -440,3 +435,64 @@ class FashionShowEntry(BaseModel):
 class CollectionData(BaseModel):
     collections: dict[str, CollectionEntry] = Field(default_factory = dict)
     fashion_show: dict[str, FashionShowEntry] = Field(default_factory = dict)
+
+
+
+
+
+@dataclass
+class GameData:
+    game_version: GameVersion = field(default_factory = GameVersion)
+    game_objects: GameObjects = field(default_factory = GameObjects)
+    group_quests: GroupQuests = field(default_factory = GroupQuests)
+    fortune_shop: FortuneShop = field(default_factory = FortuneShop)
+    tasks_data: TasksData = field(default_factory = TasksData)
+    collection_data: CollectionData = field(default_factory = CollectionData)
+
+    def save(self, dist_folder: str | Path):
+        dist_folder = Path(dist_folder)
+        
+        with open(dist_folder/'game_version.json', 'w', encoding = 'utf-8') as file:
+            file.write(self.game_version.model_dump_json(ensure_ascii = False))
+        with open(dist_folder/'game_objects.json', 'w', encoding = 'utf-8') as file:
+            file.write(self.game_objects.model_dump_json(ensure_ascii = False, indent = 2))
+        with open(dist_folder/'group_quests.json', 'w', encoding = 'utf-8') as file:
+            file.write(self.group_quests.model_dump_json(ensure_ascii = False, indent = 2))
+        with open(dist_folder/'fortune_shop.json', 'w', encoding = 'utf-8') as file:
+            file.write(self.fortune_shop.model_dump_json(ensure_ascii = False, indent = 2))
+        with open(dist_folder/'tasks_data.json', 'w', encoding = 'utf-8') as file:
+            file.write(self.tasks_data.model_dump_json(ensure_ascii = False, indent = 2))
+        with open(dist_folder/'collection_data.json', 'w', encoding = 'utf-8') as file:
+            file.write(self.collection_data.model_dump_json(ensure_ascii = False, indent = 2))
+    
+    @classmethod
+    def load(cls, dist_folder: str | Path):
+        dist_folder = Path(dist_folder)
+
+        game_version = GameVersion.model_validate_json((dist_folder/'game_version.json').read_bytes())
+        game_objects = GameObjects.model_validate_json((dist_folder/'game_objects.json').read_bytes())
+        group_quests = GroupQuests.model_validate_json((dist_folder/'group_quests.json').read_bytes())
+        fortune_shop = FortuneShop.model_validate_json((dist_folder/'fortune_shop.json').read_bytes())
+        tasks_data = TasksData.model_validate_json((dist_folder/'tasks_data.json').read_bytes())
+        collection_data = CollectionData.model_validate_json((dist_folder/'collection_data.json').read_bytes())
+        
+        return cls(
+            game_version = game_version,
+            game_objects = game_objects,
+            group_quests = group_quests,
+            fortune_shop = fortune_shop,
+            tasks_data = tasks_data,
+            collection_data = collection_data,
+        )
+    
+    def get_object(self, id: GameObjectId) -> GameObject | None:
+        result: GameObject | None = None
+
+        for category_name in CATEGORY_NAMES:
+            category: CategoryData = getattr(self.game_objects, category_name)
+
+            if id in category.objects:
+                result = category.objects[id]
+                break
+        
+        return result

@@ -13,7 +13,9 @@ dependencies = [
     "google-play-scraper>=1.2.7",
     "luna-kit[all]",
     "pillow>=12.2.0",
+    "pycairo>=1.29.0",
     "pydantic>=2.13.4",
+    "pygobject>=3.56.3",
     "requests>=2.34.2",
     "rich>=15.0.0",
 ]
@@ -36,6 +38,7 @@ luna-kit = { git = "https://github.com/ego-lay-atman-bay/luna-kit/" }
 [dependency-groups]
 dev = [
     "moto[server]>=5.2.2",
+    "pygobject-stubs>=2.17.0",
     "python-dotenv>=1.2.2",
     "types-boto3-custom",
     "types-lxml>=2026.2.16",

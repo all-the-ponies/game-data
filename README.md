@@ -15,16 +15,21 @@ S3_SECRET_KEY=testing
 S3_REGION=us-east-1
 ```
 
-To use notifications, use `notifications-example.json` to create the notifications config. You can either place it in a `notifications.dev.json` file, or a `NOTIFICATIONS_CONFIG` environment variable. The github action expects a `NOTIFICATIONS_CONFIG` secret, so here's a quick command to put `notifications.prod.json` into that secret.
-
-```shell
-jq -c < notifications.prod.json | gh secret set NOTIFICATION_CONFIG
-```
+To use notifications, use `notifications-example.json` to create the notifications config. Place it in either `notifications.dev.json` for running it in the dev environment, or `notifications.json` for production.
 
 You need to get [ffdec](https://github.com/jindrapetrik/jpexs-decompiler/), and either add it to the path, or add `--ffdec ffdec.jar` to the command.
+
+You also need to first install the `cairo` headers. Instructions can be found here: https://pycairo.readthedocs.io/en/latest/getting_started.html
 
 And of course to actually run it
 
 ```shell
 uv run game-data --version latest --upload
+```
+
+If all of this is too complicated, you can just use the docker container.
+
+```shell
+docker build -t game-data . 
+docker run --env-file .env game-data
 ```

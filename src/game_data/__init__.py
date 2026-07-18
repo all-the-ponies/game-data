@@ -17,12 +17,14 @@ from botocore.exceptions import ClientError
 from luna_kit.api import API, Version
 from luna_kit.typings import DLCManifest
 
+from .GameDataTypes import GameData
 from .app_info import get_app_info
 from .console import console
 from .crop import crop_image
 from .downloader import download
 from .env import GAME_DATA_ENV_VAR, is_dev, load_env, set_mode
 from .extractor import extract
+from .image_gen import generate_images
 from .notify import Notifier
 from .s3 import BUCKET, get_s3_client
 from .sync import sync, upload_file
@@ -132,6 +134,8 @@ def build_cdn(
         extract(arks_dir, extracted_dir)
 
         console.line()
+
+    game_data: GameData | None = None
     
     if 'transform' not in skip:
         console.print('Transforming data')
@@ -145,8 +149,15 @@ def build_cdn(
 
         transformer.start()
         transformer.save()
+        game_data = transformer.game_data
 
         console.line()
+    else:
+        game_data = GameData.load(dist_dir)
+
+    if game_data and 'image_gen' not in skip:
+        console.print('Generating images')
+        generate_images(game_data, dist_dir)
 
     if upload and s3_client:
         sync(dist_folder = dist_dir)
@@ -225,7 +236,7 @@ def create_argparser():
         '--skip',
         dest = 'skip',
         nargs = '+',
-        choices = ['download', 'extract', 'transform'],
+        choices = ['download', 'extract', 'transform', 'image_gen'],
         help = 'Skip action',
         default = [],
     )
