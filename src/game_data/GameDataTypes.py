@@ -16,6 +16,12 @@ type Language = Literal[
     'spanish', 'thai', 'turkish'
 ]
 
+LANGUAGES: list[Language] = [
+    'arabic', 'chinese', 'english', 'french', 'german', 'italian',
+    'japanese', 'korean', 'brazilian portuguese', 'russian',
+    'spanish', 'thai', 'turkish'
+]
+
 type Location = Literal[
     'PONYVILLE', 'CANTERLOT', 'SWEET_APPLE_ACRES', 'EVERFREE_FOREST',
     'CRYSTAL_EMPIRE', 'CHANGELING_KINGDOM', 'KLUGETOWN', 'UNKNOWN'

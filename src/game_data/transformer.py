@@ -1405,6 +1405,8 @@ class Transformer:
             'fashion_show': 0,
         }
 
+        images_path = 'images/collections'
+
         for collection_el in track(
             raw_collection_data,
             description = 'Getting collections...'
@@ -1455,6 +1457,7 @@ class Transformer:
                         name = self.translate_string(collection_el.attrib.get('locString', collection_id)),
                         reward = rewards,
                         items = fashion_show_items,
+                        image = {f'{images_path}/{lang}/{collection_id}.png' for lang in LANGUAGES},
                     )
                     
                     index['fashion_show'] += 1
@@ -1474,7 +1477,6 @@ class Transformer:
                             continue
                         self.game_data.game_objects.pony.objects[item.item].collections.append(collection_id)
                 
-
             except Exception as e:
                 e.add_note(f'Collections: {collection_id}')
                 console.print_exception()

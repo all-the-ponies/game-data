@@ -102,7 +102,7 @@ class CollectionImageGenerator:
 
         reward = self.game_data.get_object(collection.reward.main.item)
 
-        for language in collection.name:
+        for language, path in collection.image.items():
             surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
             ctx = cairo.Context(surface)
 
@@ -133,7 +133,7 @@ class CollectionImageGenerator:
             if reward is not None:
                 self.draw_text(
                     ctx,
-                    reward.name[language],
+                    reward.name[language], # type: ignore
                     font_family,
                     30,
                     959,
@@ -145,7 +145,7 @@ class CollectionImageGenerator:
                     shadow_offset = (0, 3),
                 )
             
-            output = self.base_output/language/f'{collection.id}.png'
+            output = self.dist_folder/path
             output.parent.mkdir(parents = True, exist_ok = True)
 
             collection.image[language] = output.relative_to(self.dist_folder).as_posix()
