@@ -93,6 +93,8 @@ class CollectionImageGenerator:
             raise
         finally:
             self.image_encode_threader.shutdown(wait = True)
+
+        self.image_futures.clear()
         
     
 
@@ -106,7 +108,6 @@ class CollectionImageGenerator:
             surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
             ctx = cairo.Context(surface)
 
-            ctx.set_operator(cairo.OPERATOR_SOURCE)
             ctx.set_source_surface(base_surface)
             ctx.paint()
 
@@ -159,7 +160,6 @@ class CollectionImageGenerator:
 
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
         ctx = cairo.Context(surface)
-        ctx.set_operator(cairo.OPERATOR_SOURCE)
         ctx.set_source_surface(self.template, 0, 0)
         ctx.paint()
 
