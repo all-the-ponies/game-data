@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 from typing import Literal, TypedDict
 import urllib.parse
+import math
 
 from PIL import Image
 from lxml import etree
@@ -22,12 +23,13 @@ from luna_kit.typings import (
     PonyTasksType,
     PrizeTypes,
 )
+from luna_kit.typings.defaultGameCampaign import MazeData as GameData_MazeData
 from luna_kit.xml import parse_xml
 
 from .GameDataTypes import *
 from .console import console, track
 from .crop import crop_image
-from .utils import strToInt
+from .utils import strToInt, strToBool
 
 
 class ObjectOverride(TypedDict):
@@ -231,6 +233,7 @@ class Transformer:
             self.get_group_quests()
             self.get_fortune_shop()
             self.get_collections()
+            self.get_maze_data()
 
             self.apply_overrides()
 
@@ -1457,7 +1460,6 @@ class Transformer:
                         name = self.translate_string(collection_el.attrib.get('locString', collection_id)),
                         reward = rewards,
                         items = fashion_show_items,
-                        image = {f'{images_path}/{lang}/{collection_id}.png' for lang in LANGUAGES},
                     )
                     
                     index['fashion_show'] += 1
@@ -1468,6 +1470,7 @@ class Transformer:
                         name = self.translate_string(collection_el.attrib.get('locString', collection_id)),
                         reward = rewards,
                         ponies = items,
+                        image = {lang: f'{images_path}/{lang}/{collection_id}.png' for lang in LANGUAGES},
                     )
                     
                     index['collection'] += 1
@@ -1480,6 +1483,148 @@ class Transformer:
             except Exception as e:
                 e.add_note(f'Collections: {collection_id}')
                 console.print_exception()
+
+    def get_maze_data(self):
+        maze_data = self.defaultGameCampaign.get('MazeData')
+        if maze_data is None:
+            with open(self.override_folder/'fallback_maze_data.json', 'r', encoding = 'utf-8') as file:
+                maze_data: GameData_MazeData | None = json.load(file)
+        
+        if maze_data is None:
+            console.print('[red]Could not get maze data[/]')
+            return
+        
+        maze_save = parse_xml(self.game_folder/'initial_pony_save_8.xml')[0][0]
+        initial_objects = maze_save.find('Inital_Objects')
+        if initial_objects is None:
+            raise ValueError('Cannot find initial maze objects')
+        
+        for object_category in initial_objects:
+            if object_category.tag == 'Pony_House_Objects':
+                for obj_el in object_category:
+                    position_el = obj_el.find('Position')
+                    house_id = obj_el.attrib['ID']
+                    if position_el is None:
+                        console.print(f'Cannot find position for {house_id}')
+                        continue
+                    
+                    self.game_data.maze_data.map.shops.append(
+                        MazeMapShop(
+                            id = house_id,
+                            x = strToInt(position_el.attrib['x']),
+                            y = strToInt(position_el.attrib['y']),
+                        )
+                    )
+            elif object_category.tag == 'MazeBlock_Objects':
+                for block_el in track(object_category, description = 'Getting maze map...'):
+                    block_id = block_el.attrib['ID']
+                    block_obj = self.gameObjectData.get_object(block_id)
+                    if block_obj is None:
+                        console.print(f'Cannot find {block_id}')
+                        continue
+
+                    position_el = block_el.find('Position')
+                    entity_el = block_el.find('Entity')
+
+                    if position_el is None:
+                        console.print(f'Cannot find position for {block_id}')
+                        continue
+
+                    block = MazeMapBlock(
+                        id = block_id,
+                        x = strToInt(position_el.get('x')),
+                        y = strToInt(position_el.get('y')),
+                        uncovered = strToBool(block_el.get('IsUncovered')),
+                        connections = {
+                            'north_east': block_obj.get('Connections', {}).get('NorthEast', False),
+                            'north_west': block_obj.get('Connections', {}).get('NorthWest', False),
+                            'south_east': block_obj.get('Connections', {}).get('SouthEast', False),
+                            'south_west': block_obj.get('Connections', {}).get('SouthWest', False),
+                        },
+                    )
+
+                    if entity_el is not None:
+                        block.entity = MazeBlockEntity(
+                            id = entity_el.attrib['ID'],
+                            type = entity_el.attrib['Type'], # type: ignore
+                        )
+                    
+                    self.game_data.maze_data.map.blocks.append(block)
+                
+        for maze_pony in track(
+            self.gameObjectData['MazePony'].values(),
+            description = 'Getting maze ponies...'
+        ):
+            self.game_data.maze_data.ponies[maze_pony.id] = MazePony(
+                id = maze_pony.id,
+                pony = maze_pony.get('Parent', {}).get('PonyName', ''),
+                power = maze_pony.get('Stats', {}).get('DamagePower', 0),
+                fights = maze_pony.get('Stats', {}).get('Fights_Amount', 0),
+                upgraded = maze_pony.get('Stats', {}).get('Elite_By_Default', 0),
+            )
+        
+
+        for maze_boss in track(
+            self.gameObjectData['MazeBoss'].values(),
+            description = 'Getting maze bosses...'
+        ):
+            self.game_data.maze_data.bosses[maze_boss.id] = MazeBoss(
+                id = maze_boss.id,
+                pony = maze_boss.get('Parent', {}).get('PonyName', ''),
+                required_power = math.ceil(maze_boss.get('Stats', {}).get('Hits', 0) / (7 + (2 * maze_boss.get('Stats', {}).get('CritMultiplier', 0)))),
+                hp = maze_boss.get('Stats', {}).get('Hits', 0),
+                required_energy = maze_boss.get('Stats', {}).get('RequiredEnergy', 0),
+                critical_multiplier = maze_boss.get('Stats', {}).get('CritMultiplier', 0),
+                drop_chest = maze_boss.get('Fights', {}).get('DropChest', ''),
+                rewards = [
+                    MazeBossReward(
+                        item = item,
+                        amount = amount,
+                    )
+                    for item, amount in zip(
+                        maze_boss.get('Rewards', {}).get('Prizes', []),
+                        maze_boss.get('Rewards', {}).get('Amounts', []),
+                    )
+                    if item
+                ],
+            )
+
+        for maze_shop in track(
+            self.gameObjectData['MazeChest'].values(),
+            description = 'Getting maze chests...'
+        ):
+            self.game_data.maze_data.chests[maze_shop.id] = MazeChest(
+                id = maze_shop.id,
+                tier = maze_shop.get('Rewards', {}).get('TierID', ''),
+            )
+
+
+        for maze_shop in track(
+            self.gameObjectData['MazeChest'].values(),
+            description = 'Getting maze shops...'
+        ):
+            self.game_data.maze_data.shops[maze_shop.id] = MazeShop(
+                id = maze_shop.id,
+                tier = maze_shop.get('Display', {}).get('TierID', ''),
+            )
+        
+        for tier_id, tier_info in maze_data['MazePonyPrice'].items():
+            self.game_data.maze_data.shop_tiers[tier_id] = MazeShopTier(
+                id = tier_id,
+                slots = [
+                    MazeShopSlot(
+                        id = slot[0].get('id', ''),
+                        price = slot[0].get('price', ''),
+                    )
+                    for slot in tier_info.values()
+                ]
+            )
+
+        for tier_id, tier_info in maze_data['ChestRewards'].items():
+            self.game_data.maze_data.chest_rewards[tier_id] = [
+                slot['id']
+                for slot in tier_info
+            ]
 
     
     def translate_string(self, key: str) -> TranslatableString:

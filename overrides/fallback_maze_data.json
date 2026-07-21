@@ -1,0 +1,1038 @@
+{
+  "MazePonyPrice": {
+    "Tier1": {
+      "Slot1": [
+        {
+          "currency": 14,
+          "price": 4400,
+          "id": "MazePony_Disguised_Queen_Chrysalis"
+        }
+      ],
+      "Slot0": [
+        {
+          "currency": 14,
+          "price": 2500,
+          "id": "MazePony_Pest_Control_Pony"
+        }
+      ],
+      "Slot2": [
+        {
+          "currency": 14,
+          "price": 6500,
+          "id": "MazePony_Minotaurocellus_Blue"
+        }
+      ]
+    },
+    "Tier0": {
+      "Slot1": [
+        {
+          "currency": 14,
+          "price": 3000,
+          "id": "MazePony_Red_Delicious"
+        }
+      ],
+      "Slot0": [
+        {
+          "currency": 14,
+          "price": 2200,
+          "id": "MazePony_Perfect_Pace"
+        }
+      ],
+      "Slot2": [
+        {
+          "currency": 14,
+          "price": 5500,
+          "id": "MazePony_Gleeful_Clownspony"
+        }
+      ]
+    },
+    "Tier3": {
+      "Slot1": [
+        {
+          "currency": 14,
+          "price": 7000,
+          "id": "MazePony_Flash_Magnus"
+        }
+      ],
+      "Slot0": [
+        {
+          "currency": 14,
+          "price": 4000,
+          "id": "MazePony_Gustave_le_Grand"
+        }
+      ],
+      "Slot2": [
+        {
+          "currency": 14,
+          "price": 9500,
+          "id": "MazePony_Minotaurocellus_Yellow"
+        }
+      ]
+    },
+    "Tier2": {
+      "Slot1": [
+        {
+          "currency": 14,
+          "price": 6000,
+          "id": "MazePony_Greta"
+        }
+      ],
+      "Slot0": [
+        {
+          "currency": 14,
+          "price": 3400,
+          "id": "MazePony_Claude_the_Puppeteer"
+        }
+      ],
+      "Slot2": [
+        {
+          "currency": 14,
+          "price": 7500,
+          "id": "MazePony_Wind_Rider"
+        }
+      ]
+    },
+    "Tier5": {
+      "Slot1": [
+        {
+          "currency": 14,
+          "price": 15000,
+          "id": "MazePony_Appledrac"
+        }
+      ],
+      "Slot0": [
+        {
+          "currency": 14,
+          "price": 6500,
+          "id": "MazePony_Young_Burnt_Oak"
+        }
+      ],
+      "Slot2": [
+        {
+          "currency": 14,
+          "price": 16500,
+          "id": "MazePony_Minotaurocellus_Purple"
+        }
+      ]
+    },
+    "Tier4": {
+      "Slot1": [
+        {
+          "currency": 14,
+          "price": 13500,
+          "id": "MazePony_Serene_Dignitary"
+        }
+      ],
+      "Slot0": [
+        {
+          "currency": 14,
+          "price": 5500,
+          "id": "MazePony_Midnight_Strike"
+        }
+      ],
+      "Slot2": [
+        {
+          "currency": 14,
+          "price": 15000,
+          "id": "MazePony_Stuffy_Dignitary"
+        }
+      ]
+    },
+    "Tier7": {
+      "Slot1": [
+        {
+          "currency": 14,
+          "price": 17500,
+          "id": "MazePony_Anugyptian_Retainer"
+        }
+      ],
+      "Slot0": [
+        {
+          "currency": 14,
+          "price": 8600,
+          "id": "MazePony_Coco_Crusoe"
+        }
+      ],
+      "Slot2": [
+        {
+          "currency": 14,
+          "price": 19000,
+          "id": "MazePony_Minotaurocellus_Red"
+        }
+      ]
+    },
+    "Tier6": {
+      "Slot1": [
+        {
+          "currency": 14,
+          "price": 16500,
+          "id": "MazePony_Madden"
+        }
+      ],
+      "Slot0": [
+        {
+          "currency": 14,
+          "price": 7700,
+          "id": "MazePony_Apple_Stars"
+        }
+      ],
+      "Slot2": [
+        {
+          "currency": 14,
+          "price": 18000,
+          "id": "MazePony_Mean_Fluttershy"
+        }
+      ]
+    },
+    "Tier9": {
+      "Slot1": [
+        {
+          "currency": 14,
+          "price": 17900,
+          "id": "MazePony_Changelingverse_Fluttershy"
+        }
+      ],
+      "Slot0": [
+        {
+          "currency": 14,
+          "price": 8900,
+          "id": "MazePony_Jumbo_Don"
+        }
+      ],
+      "Slot2": [
+        {
+          "currency": 14,
+          "price": 19500,
+          "id": "MazePony_Changelingverse_Pinkie_Pie"
+        }
+      ]
+    },
+    "Tier8": {
+      "Slot1": [
+        {
+          "currency": 14,
+          "price": 18500,
+          "id": "MazePony_Mirror_Universe_Cadance"
+        }
+      ],
+      "Slot0": [
+        {
+          "currency": 14,
+          "price": 10000,
+          "id": "MazePony_Future_Big_Mac"
+        }
+      ],
+      "Slot2": [
+        {
+          "currency": 14,
+          "price": 20000,
+          "id": "MazePony_Snobbish_Waiter_Pony"
+        }
+      ]
+    },
+    "Tier101": {
+      "Slot0": [
+        {
+          "currency": 14,
+          "price": 500,
+          "id": "MazePony_Bon_Bon"
+        }
+      ]
+    },
+    "Tier10": {
+      "Slot1": [
+        {
+          "currency": 14,
+          "price": 19000,
+          "id": "MazePony_Distinguished_Waiter_Pony"
+        }
+      ],
+      "Slot0": [
+        {
+          "currency": 14,
+          "price": 10500,
+          "id": "MazePony_Forward_Thinking_Friendship_Student"
+        }
+      ],
+      "Slot2": [
+        {
+          "currency": 14,
+          "price": 21000,
+          "id": "MazePony_Timbucktus_Guard"
+        }
+      ]
+    }
+  },
+  "ChestRewards": {
+    "Tier1": [
+      {
+        "max": 1,
+        "id": "MazePony_Serenades_Bodyguard",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Grizzled_Old_Wonderbolt",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Disguised_Celestia",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Grandpa_Skies",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_MC_Pony",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Honorable_Flim",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Lilac_Sky",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Feather_Bangs",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Cherry_Fizzy",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Unicorn_Guard",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Russet_Maned_Future_Townspony",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Swashbuckling_Pirate",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Tempest_Shadow",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Professor_Fossil",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Blackthorn",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Prince_Rutherford",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Comet_Tail",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Stubborn_Crystal_Pony",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Winterzilla",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Xmas_Merry",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Coriander_Cumin",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Mean_Applejack",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Mighty_Yak",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Francesco",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Charming_Hippogriff",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Four_Step",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Anti_Sugar_Drummer",
+        "weight": 10,
+        "min": 1
+      }
+    ],
+    "Tier0": [
+      {
+        "max": 1,
+        "id": "MazePony_Rare_Find",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Sea_Swirl",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Pin_Pony",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Crystal_Guard_2",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Knowledgeable_Shopper",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Apple_Pinkie_Pie",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Zesty_Gourmand",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Gala_Appleby",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Xmas_Snowdash",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Xmas_Snowfall_Frost",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Umbra",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Toe_Tapper",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Torch_Song",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Ocelluss_Sister",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Gold_Toothed_Pirate",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Allie_Way",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Star_Hunter",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Lady_Justice",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Emerald_Green",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Manehattan_Delegate",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Moody_Root",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Brigand",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Xmas_Demure",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Stylish_Fan",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Lemony_Gem",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Russet_Dragon",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Concierge",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Chrysalis",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Mamas_Colt_Pirate",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Metamorphosed_Worker",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Sky_Stinger",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Gabby",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Builder_Pony",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Golden_Delicious",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Ecstatic_Dancer",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Changeling_Counselor",
+        "weight": 10,
+        "min": 1
+      }
+    ],
+    "Tier3": [
+      {
+        "max": 1,
+        "id": "MazePony_Admiral_Fairweather",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Anti_Sugar_Pinkie_Pie",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Autumn_Blaze",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Bell_Hop_Pony",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Big_Angie",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Paramedic_Pony",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Centaur_Castle_Guard",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Chancellor_Puddinghead",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Curio_Shopkeeper",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Corsaged_Gangster_Pony",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Diamante_Elegante",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Smug_Bully",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Halloween_03",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Lumpy",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Mayor_Blossom",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Snide_Bully",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Pinstriped_Gangster_Pony",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Pone_Fantastique_Director",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Princess_Eris",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Smart_Cookie",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Smoky_Jr",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Fauxlestias_Guard",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Tracksuited_Gangster_Pony",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Flowy_Maned_Breezie",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Cutting_Edge_Shop_Pony",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Duke_Of_Maretonia",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Wise_Muffins",
+        "weight": 10,
+        "min": 1
+      }
+    ],
+    "Tier2": [
+      {
+        "max": 1,
+        "id": "MazePony_Auntie_Lofty",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Future_Pumpkin_Cake",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Horwitz",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Savoir_Fare",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Lavender_Dragon",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Mane_Allgood",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Pygolian_Hamster_Chieftain",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Rolling_Thunder",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Skeptical_Old_Wonderbolt",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_The_Dark_Horse",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Young_Mayor_Mare",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Glenda",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Hoops",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Hyped_Up_Dancer",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Zipporwhill",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Mustashe_Crystal_Pony",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Nirik_Autumn_Blaze",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Prideful_Griffon_Racer",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Queen_Haydon",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Quill",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Urtica",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Xmas_Spirit_of_Present",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Decorated_Yak",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Collected_Kirin",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Frankenstags_Monster",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_High_Heel",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Long_Face",
+        "weight": 10,
+        "min": 1
+      }
+    ],
+    "Boss1": [
+      {
+        "max": 1,
+        "id": "MazePony_The_Storm_King",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Night_Watch",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Royal_Legionnaire",
+        "weight": 10,
+        "min": 1
+      }
+    ],
+    "Boss2": [
+      {
+        "max": 1,
+        "id": "MazePony_Chaos_Roadhouse_Sentry",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Short_Fuse",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Bright_Eyed_Yak_Calf",
+        "weight": 10,
+        "min": 1
+      }
+    ],
+    "Boss3": [
+      {
+        "max": 1,
+        "id": "MazePony_Crystal_Guard_1",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Rookie_Archaeologist",
+        "weight": 10,
+        "min": 1
+      },
+      {
+        "max": 1,
+        "id": "MazePony_Rockhoof",
+        "weight": 10,
+        "min": 1
+      }
+    ]
+  }
+}

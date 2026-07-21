@@ -305,7 +305,7 @@ def main() -> None:
             )
     
             peak_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
-            print(f"Peak Memory Usage: {peak_memory:.2f} MB")
+            console.log(f"Peak Memory Usage: {peak_memory:.2f} MB")
 
         case 'upload':
             input: str = args.input

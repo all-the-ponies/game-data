@@ -443,8 +443,79 @@ class CollectionData(BaseModel):
     fashion_show: dict[str, FashionShowEntry] = Field(default_factory = dict)
 
 
+class MazeBlockEntity(BaseModel):
+    id: str
+    type: Literal['MazeBlock_Start', 'MazeBoss', 'MazeChest', 'MazeShop']
+
+class MazeMapBlock(BaseModel):
+    id: str
+    x: int
+    y: int
+    connections: dict[Literal[
+        'north_east',
+        'north_west',
+        'south_east',
+        'south_west',
+    ], bool]
+    uncovered: bool
+    entity: MazeBlockEntity | None = None
+
+class MazeMapShop(BaseModel):
+    id: GameObjectId
+    x: int
+    y: int
+
+class MazeMap(BaseModel):
+    blocks: list[MazeMapBlock] = Field(default_factory = list)
+    shops: list[MazeMapShop] = Field(default_factory = list)
 
 
+class MazeShopSlot(BaseModel):
+    id: str
+    price: int
+
+class MazeShopTier(BaseModel):
+    id: str
+    slots: list[MazeShopSlot]
+
+class MazeChest(BaseModel):
+    id: str
+    tier: str
+
+class MazeBossReward(BaseModel):
+    item: GameObjectId
+    amount: int
+
+class MazeBoss(BaseModel):
+    id: str
+    pony: GameObjectId
+    required_power: int
+    hp: int
+    required_energy: int
+    critical_multiplier: float
+    drop_chest: str
+    rewards: list[MazeBossReward]
+
+class MazeShop(BaseModel):
+    id: str
+    tier: str
+
+class MazePony(BaseModel):
+    id: str
+    pony: GameObjectId
+    power: int
+    fights: int
+    upgraded: bool
+
+
+class MazeData(BaseModel):
+    map: MazeMap = Field(default_factory = MazeMap)
+    shop_tiers: dict[str, MazeShopTier] = Field(default_factory = dict)
+    chest_rewards: dict[str, list[str]] = Field(default_factory = dict)
+    ponies: dict[str, MazePony] = Field(default_factory = dict)
+    chests: dict[str, MazeChest] = Field(default_factory = dict)
+    bosses: dict[str, MazeBoss] = Field(default_factory = dict)
+    shops: dict[str, MazeShop] = Field(default_factory = dict)
 
 @dataclass
 class GameData:
@@ -454,6 +525,7 @@ class GameData:
     fortune_shop: FortuneShop = field(default_factory = FortuneShop)
     tasks_data: TasksData = field(default_factory = TasksData)
     collection_data: CollectionData = field(default_factory = CollectionData)
+    maze_data: MazeData = field(default_factory = MazeData)
 
     def save(self, dist_folder: str | Path):
         dist_folder = Path(dist_folder)
@@ -470,6 +542,8 @@ class GameData:
             file.write(self.tasks_data.model_dump_json(ensure_ascii = False, indent = 2))
         with open(dist_folder/'collection_data.json', 'w', encoding = 'utf-8') as file:
             file.write(self.collection_data.model_dump_json(ensure_ascii = False, indent = 2))
+        with open(dist_folder/'maze_data.json', 'w', encoding = 'utf-8') as file:
+            file.write(self.maze_data.model_dump_json(ensure_ascii = False, indent = 2))
     
     @classmethod
     def load(cls, dist_folder: str | Path):
@@ -481,6 +555,7 @@ class GameData:
         fortune_shop = FortuneShop.model_validate_json((dist_folder/'fortune_shop.json').read_bytes())
         tasks_data = TasksData.model_validate_json((dist_folder/'tasks_data.json').read_bytes())
         collection_data = CollectionData.model_validate_json((dist_folder/'collection_data.json').read_bytes())
+        maze_data = MazeData.model_validate_json((dist_folder/'maze_data.json').read_bytes())
         
         return cls(
             game_version = game_version,
@@ -489,6 +564,7 @@ class GameData:
             fortune_shop = fortune_shop,
             tasks_data = tasks_data,
             collection_data = collection_data,
+            maze_data = maze_data,
         )
     
     def get_object(self, id: GameObjectId) -> GameObject | None:
