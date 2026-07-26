@@ -656,5 +656,155 @@
         ]
       }
     }
+  },
+  "shop": {
+    "House_Bad_Changelings_Place": {
+      "tags": ["unused"]
+    }
+  },
+  "house": {
+    "House_Generic1": {
+      "tags": ["unused"]
+    },
+    "House_Generic2": {
+      "tags": ["unused"]
+    },
+    "House_Generic3": {
+      "tags": ["unused"]
+    },
+    "House_Canterlot3": {
+      "tags": ["unused"]
+    },
+    "House_Octavia": {
+      "tags": ["unused"]
+    },
+    "House_Crescentmoon": {
+      "tags": ["unused"]
+    },
+    "House_FlashyPony": {
+      "tags": ["unused"]
+    },
+    "House_AppleCobbler": {
+      "tags": ["unused"]
+    },
+    "House_Applefritter": {
+      "tags": ["unused"]
+    },
+    "House_canterlot_aframe": {
+      "tags": ["unused"]
+    },
+    "House_canterlot_balcony": {
+      "tags": ["unused"]
+    },
+    "House_canterlot_golden": {
+      "tags": ["unused"]
+    },
+    "House_canterlot_stairs": {
+      "tags": ["unused"]
+    },
+    "House_canterlot_towers": {
+      "tags": ["unused"]
+    },
+    "House_princess_cadence": {
+      "tags": ["unused"]
+    },
+    "House_Flash_Sentry": {
+      "tags": ["unused"]
+    },
+    "House_AuntOrange": {
+      "tags": ["unused"]
+    },
+    "House_type_a_saa": {
+      "tags": ["unused"]
+    },
+    "House_type_b_saa": {
+      "tags": ["unused"]
+    },
+    "House_PrimHemline": {
+      "tags": ["unused"]
+    },
+    "House_Gather_Logs": {
+      "tags": ["unused"]
+    },
+    "House_Gather_Lianas": {
+      "tags": ["unused"]
+    },
+    "House_Hive_Diversion_Zone": {
+      "tags": ["unused"]
+    },
+    "House_Hive_Distraction_Place": {
+      "tags": ["unused"]
+    },
+    "House_Airship_Docks": {
+      "tags": ["unused"]
+    },
+    "House_Hoovesian_Lab": {
+      "tags": ["unused"]
+    }
+  },
+  "decor": {
+    "Decoration_SingleTree1": {
+      "tags": ["unused"]
+    },
+    "Decoration_Bush02": {
+      "tags": ["unused"]
+    },
+    "Decoration_SingleTree2": {
+      "tags": ["unused"]
+    },
+    "Decoration_PicnicTable2": {
+      "tags": ["unused"]
+    },
+    "Decoration_Love_potion": {
+      "tags": ["unused"]
+    },
+    "Decoration_Volleyball": {
+      "tags": ["unused"]
+    },
+    "Decoration_forest_tree": {
+      "tags": ["unused"]
+    },
+    "Decoration_gloomy_tree": {
+      "tags": ["unused"]
+    },
+    "Decoration_shady_tree": {
+      "tags": ["unused"]
+    },
+    "Decoration_forest_eff": {
+      "tags": ["unused"]
+    },
+    "Spotlight_Yellow": {
+      "tags": ["unused"]
+    },
+    "Spotlight_Blue": {
+      "tags": ["unused"]
+    },
+    "Spotlight_Rainbow": {
+      "tags": ["unused"]
+    },
+    "Cannons": {
+      "tags": ["unused"]
+    },
+    "Decoration_Crystal_Stadium": {
+      "tags": ["unused"]
+    },
+    "Decoration_CK_Tree_01": {
+      "tags": ["unused"]
+    },
+    "Decoration_CK_Tree_02": {
+      "tags": ["unused"]
+    },
+    "Decoration_CK_Tree_03": {
+      "tags": ["unused"]
+    },
+    "Decoration_CK_Desert_Tree_03": {
+      "tags": ["unused"]
+    },
+    "Decoration_CK_Desert_Tree_04": {
+      "tags": ["unused"]
+    },
+    "Decoration_CK_Desert_Tree_05": {
+      "tags": ["unused"]
+    }
   }
 }
