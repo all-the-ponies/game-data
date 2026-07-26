@@ -22,6 +22,7 @@ from luna_kit.typings import (
     GroupQuestsType,
     PonyTasksType,
     PrizeTypes,
+    ArenaQTESettingsType,
 )
 from luna_kit.typings.defaultGameCampaign import MazeData as GameData_MazeData
 from luna_kit.xml import parse_xml
@@ -462,7 +463,7 @@ class Transformer:
                 house_info.residents = residents
 
                 location: Location = 'UNKNOWN' if shop_data is None else LOCATIONS.get(
-                    strToInt(shop_data.get('MapZone', -1)),
+                    strToInt(shop_data.get('MapZone', -1).split(',')[0]),
                     'UNKNOWN',
                 )
 
@@ -554,7 +555,7 @@ class Transformer:
 
                 if shop_data is not None:
                     decor_info.location = LOCATIONS.get(
-                        strToInt(shop_data.get('MapZone', -1)),
+                        strToInt(shop_data.get('MapZone', -1).split(',')[0]),
                         'UNKNOWN',
                     )
                 
@@ -1494,6 +1495,12 @@ class Transformer:
             console.print('[red]Could not get maze data[/]')
             return
         
+        with open(self.game_folder/'arenaqtesettings.json', 'r', encoding = 'utf-8') as file:
+            arena_qt_settings: ArenaQTESettingsType = json.load(file)
+        
+        arena_presets = {preset['ID']: preset for preset in arena_qt_settings['Presets']}
+
+        
         maze_save = parse_xml(self.game_folder/'initial_pony_save_8.xml')[0][0]
         initial_objects = maze_save.find('Inital_Objects')
         if initial_objects is None:
@@ -1571,7 +1578,7 @@ class Transformer:
             self.game_data.maze_data.bosses[maze_boss.id] = MazeBoss(
                 id = maze_boss.id,
                 pony = maze_boss.get('Parent', {}).get('PonyName', ''),
-                required_power = math.ceil(maze_boss.get('Stats', {}).get('Hits', 0) / (7 + (2 * maze_boss.get('Stats', {}).get('CritMultiplier', 0)))),
+                required_power = math.ceil(maze_boss.get('Stats', {}).get('Hits', 0) / arena_presets.get(maze_boss.get('Fights', {}).get('QTEPreset', ''), {}).get('ActionHitsNum', 1)),
                 hp = maze_boss.get('Stats', {}).get('Hits', 0),
                 required_energy = maze_boss.get('Stats', {}).get('RequiredEnergy', 0),
                 critical_multiplier = maze_boss.get('Stats', {}).get('CritMultiplier', 0),
@@ -1600,7 +1607,7 @@ class Transformer:
 
 
         for maze_shop in track(
-            self.gameObjectData['MazeChest'].values(),
+            self.gameObjectData['MazeShop'].values(),
             description = 'Getting maze shops...'
         ):
             self.game_data.maze_data.shops[maze_shop.id] = MazeShop(
