@@ -13,6 +13,7 @@ from PIL import Image
 from lxml import etree
 
 from luna_kit.gameobjectdata import GameObjectData, ShopItem
+from luna_kit.questtable import QuestManager
 from luna_kit.loc import LOC
 from luna_kit.pvr import PVR
 from luna_kit.swf import swf2webp
@@ -191,6 +192,8 @@ class Transformer:
             item['item_id']: item['cost']
             for item in self.defaultGameCampaign.get('mini_games', {}).get('dailygoals', {}).get('itemshop', [])
         }
+
+        self.quest_manager = QuestManager(self.game_folder/'questmanager.xml')
         
         content_version: str = parse_xml(self.game_folder/'data_ver.xml')[0].get('Value', '')
         
@@ -1486,6 +1489,11 @@ class Transformer:
                 console.print_exception()
 
     def get_maze_data(self):
+        main_images = self.images_folder/'events/main/'
+        outro_images = self.images_folder/'events/outro/'
+        main_images.mkdir(parents = True, exist_ok = True)
+        outro_images.mkdir(parents = True, exist_ok = True)
+        
         maze_data = self.defaultGameCampaign.get('MazeData')
         if maze_data is None:
             with open(self.override_folder/'fallback_maze_data.json', 'r', encoding = 'utf-8') as file:
@@ -1505,6 +1513,20 @@ class Transformer:
         initial_objects = maze_save.find('Inital_Objects')
         if initial_objects is None:
             raise ValueError('Cannot find initial maze objects')
+        
+        maze_quest_info = self.quest_manager['UPD59_Maze_TLS']
+        self.game_data.maze_data.id = maze_quest_info.name
+        self.game_data.maze_data.name = self.translate_string(maze_quest_info.loc_name)
+        self.game_data.maze_data.image = {
+            'main': self.add_image(
+                [maze_quest_info.image],
+                main_images/f'{maze_quest_info.name}.png',
+            ),
+            'outro': self.add_image(
+                [maze_quest_info.final_image],
+                outro_images/f'{maze_quest_info.name}.png',
+            ),
+        }
         
         for object_category in initial_objects:
             if object_category.tag == 'Pony_House_Objects':

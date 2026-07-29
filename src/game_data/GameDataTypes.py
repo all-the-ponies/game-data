@@ -509,6 +509,9 @@ class MazePony(BaseModel):
 
 
 class MazeData(BaseModel):
+    id: str = ''
+    name: TranslatableString = Field(default_factory = dict)
+    image: ImageBase[Literal['outro']] = Field(default_factory = dict)
     map: MazeMap = Field(default_factory = MazeMap)
     shop_tiers: dict[str, MazeShopTier] = Field(default_factory = dict)
     chest_rewards: dict[str, list[str]] = Field(default_factory = dict)
