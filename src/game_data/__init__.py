@@ -17,7 +17,7 @@ from botocore.exceptions import ClientError
 from luna_kit.api import API, Version
 from luna_kit.typings import DLCManifest
 
-from .GameDataTypes import GameData
+from .GameDataTypes import GameData, GameVersion
 from .app_info import get_app_info
 from .console import console
 from .crop import crop_image
@@ -57,19 +57,26 @@ def build_cdn(
     notifier = Notifier()
 
     if s3_client and (version == 'latest' or force):
-        last_version: str | None = None
+        last_version: GameVersion | None = None
         try:
             version_file = s3_client.get_object(
                 Bucket = BUCKET,
-                Key = 'game_version.json',
+                Key = 'game_version_checker/game_version.json',
             )
-            last_version = json.load(version_file['Body'])['game_version']
+            last_version = GameVersion.model_validate_json(version_file['Body'].read())
         except:
             try:
-                with open(dist_dir/'game_version.json', 'r') as file:
-                    last_version = json.load(file)['game_version']
+                version_file = s3_client.get_object(
+                    Bucket = BUCKET,
+                    Key = 'game_version.json',
+                )
+                last_version = GameVersion.model_validate_json(version_file['Body'].read())
             except:
-                console.print('Could not get current version')
+                try:
+                    with open(dist_dir/'game_version.json', 'r') as file:
+                        last_version = json.load(file)['game_version']
+                except:
+                    console.print('Could not get current version')
         
         app_info = get_app_info()
         if version == 'latest':
@@ -82,16 +89,33 @@ def build_cdn(
         notifier.app_icon = app_info.icon_url
 
         version = latest_version
-        if not last_version or Version.parse(latest_version) > Version.parse(last_version):
+        if not last_version or Version.parse(latest_version) > Version.parse(last_version.game_version):
             console.print(f'New app version found: [yellow]{latest_version}[/]')
             notifier.notify('app')
+
+            if last_version:
+                last_version.game_version = latest_version
+            else:
+                last_version = GameVersion(
+                    game_version = latest_version
+                )
+
+            try:
+                s3_client.put_object(
+                    Bucket = BUCKET,
+                    Key = 'game_version_checker/game_version.json',
+                    Body = last_version.model_dump_json().encode('utf-8'),
+                    ContentType = 'application/json',
+                )
+            except:
+                console.print('[red]Failed to save dlc_manifest[/]')
         else:
-            api = API('android', last_version)
+            api = API('android', last_version.game_version)
 
             try:
                 last_dlc_manifest_file = s3_client.get_object(
                     Bucket = BUCKET,
-                    Key = 'current_dlc_manifest.json',
+                    Key = 'game_version_checker/current_dlc_manifest.json',
                 )
                 last_dlc_manifest = json.load(last_dlc_manifest_file['Body'])
 
@@ -105,11 +129,23 @@ def build_cdn(
                     console.print('New content update found!')
                     notifier.notify('content')
 
+                    try:
+                        s3_client.put_object(
+                            Bucket = BUCKET,
+                            Key = 'game_version_checker/current_dlc_manifest.json',
+                            Body = json.dumps(latest_dlc_manifest).encode('utf-8'),
+                            ContentType = 'application/json',
+                        )
+                    except:
+                        console.print('[red]Failed to save dlc_manifest[/]')
+
             except ClientError:
                 console.print('Could not check dlc_manifest')
                 notifier.notify('content')
             
         console.print(f'[green]Found version {version}[/]')
+
+        return # For now to prevent errors when 11.3.0 releases
     else:
         console.print(f'version: {version}')
         
@@ -161,17 +197,6 @@ def build_cdn(
 
     if upload and s3_client:
         sync(dist_folder = dist_dir)
-        
-        api = API('android', version)
-        dlc_manifest = api.get_dlc_manifest()
-        try:
-            s3_client.put_object(
-                Bucket = BUCKET,
-                Key = 'current_dlc_manifest.json',
-                Body = json.dumps(dlc_manifest).encode('utf-8'),
-            )
-        except:
-            console.print('[red]Failed to save dlc_manifest[/]')
     
     console.log(f'Time: {(perf_counter() - start_time) / 60:.2f}m')
     
