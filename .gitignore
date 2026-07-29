@@ -162,6 +162,7 @@ cython_debug/
 
 
 .vscode/
+.wrangler/
 ffdec/
 raw/*
 !raw/.gitkeep
