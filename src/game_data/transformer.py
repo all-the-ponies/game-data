@@ -1405,7 +1405,11 @@ class Transformer:
         collections = self.game_data.collection_data.collections
         fashion_show = self.game_data.collection_data.fashion_show
 
-        raw_collection_data = parse_xml(self.game_folder/'collectionData.xml')[0][0]
+        used_collections = set[str]()
+        fashion_show_collections = set[str]()
+        vip_collections = set[str]()
+
+        raw_collection_xml = parse_xml(self.game_folder/'collectionData.xml')[0]
 
         index: dict[Literal['collection', 'fashion_show'], int] = {
             'collection': 0,
@@ -1414,8 +1418,42 @@ class Transformer:
 
         images_path = 'images/collections'
 
+
+        collection_data = raw_collection_xml.find('CollectionData')
+        collection_type_data = raw_collection_xml.find('CollectionType')
+        collection_flags_data = raw_collection_xml.find('OtherFlags')
+
+        if collection_data is None or collection_type_data is None or collection_flags_data is None:
+            raise ValueError('Collection data malformed')
+        
+        for collection_list in collection_type_data:
+            if collection_list.tag != 'CollectionList':
+                continue
+            collection_type = collection_list.get('collectionType')
+            
+            if collection_type == 'Collections':
+                collection_set = used_collections
+            elif collection_type == 'FashionShow':
+                collection_set = fashion_show_collections
+            else:
+                continue
+
+            for collection_item in collection_list:
+                if collection_item.tag != 'Collection':
+                    continue
+                collection_set.add(collection_item.attrib['collectionId'])
+        
+        for collection_flag_list in collection_flags_data:
+            if collection_flag_list.tag != 'DependsOnVIP':
+                continue
+
+            for collection_item in collection_flag_list:
+                if collection_item.tag != 'Collection':
+                    continue
+                vip_collections.add(collection_item.attrib['id'])
+
         for collection_el in track(
-            raw_collection_data,
+            collection_data,
             description = 'Getting collections...'
         ):
             collection_id = collection_el.attrib['collectionId']
@@ -1468,10 +1506,18 @@ class Transformer:
                     
                     index['fashion_show'] += 1
                 else:
+                    tags: list[str] = []
+
+                    if collection_id not in used_collections:
+                        tags.append('unused')
+                    if collection_id in vip_collections:
+                        tags.append('vip')
+
                     collections[collection_id] = CollectionEntry.model_construct(
                         index = index['collection'],
                         id = collection_id,
                         name = self.translate_string(collection_el.attrib.get('locString', collection_id)),
+                        tags = tags,
                         reward = rewards,
                         ponies = items,
                         image = {lang: f'{images_path}/{lang}/{collection_id}.png' for lang in LANGUAGES},

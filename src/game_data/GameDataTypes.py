@@ -423,6 +423,7 @@ class CollectionEntry(BaseModel):
     index: int
     id: str
     name: TranslatableString
+    tags: list[str]
     ponies: list[CollectionItem]
     reward: CollectionReward
     image: TranslatableString = Field(default_factory = dict)
