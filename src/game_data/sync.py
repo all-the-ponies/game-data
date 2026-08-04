@@ -22,11 +22,13 @@ from .GameDataTypes import (
 )
 from .console import COLUMNS, console, track
 from .s3 import BUCKET, get_s3_client
+from .utils import json_dumps_compact
 
 if TYPE_CHECKING:
     from types_boto3_s3.client import S3Client
 
 MAX_WORKERS = 10
+HEADERS_TO_CHECK = ['CacheControl', 'ContentType']
 
 
 def get_image_metadata(file: bytes) -> dict[Literal['width', 'height'], str]:
@@ -43,6 +45,7 @@ def upload_file(
     key: str,
     content_type: str | None = None,
     override: bool = False,
+    cache_control: str | None = None,
 ):
     metadata = {}
 
@@ -55,27 +58,38 @@ def upload_file(
     
     if content_type == 'application/json':
         json_data = json.loads(data)
-        data = json.dumps(json_data, ensure_ascii = False, separators=(",", ":")).encode('utf-8')
+        data = json_dumps_compact(json_data).encode('utf-8')
+    
+    if cache_control:
+        extra_args['CacheControl'] = cache_control
         
     hash = hashlib.sha256(data).hexdigest()
 
     metadata['hash'] = hash
 
     upload = True
+    update = False
+    current_metadata: dict[str, str] = metadata
 
     if override:
         metadata['override'] = 'true'
     else:
         try:
             object = client.head_object(Bucket = bucket, Key = key)
+            current_metadata = object['Metadata']
             if object['Metadata'].get('override') == 'true' or object['Metadata'].get('hash') == hash:
                 upload = False
+            
+            for header in HEADERS_TO_CHECK:
+                if object.get(header) != extra_args.get(header):
+                    update = True
+            
         except botocore.exceptions.ClientError as e:
             if e.response.get('Error', {}).get('Code', '') == '404':
                 upload = True
             else:
                 raise
-
+    
     if upload:
         try:
             client.put_object(
@@ -88,6 +102,22 @@ def upload_file(
         except Exception as e:
             e.add_note(f'File: {key}')
             console.print_exception()
+    elif update:
+        console.print(f'Updating: {key}')
+        try:
+            client.copy_object(
+                Bucket = bucket,
+                Key = key,
+                CopySource = {'Bucket': bucket, 'Key': key},
+                Metadata = current_metadata,
+                MetadataDirective = 'REPLACE',
+                **extra_args,
+            )
+        except Exception as e:
+            e.add_note(f'File: {key}')
+            console.print_exception()
+    
+    return hash
 
 def upload_single_file(
     client: 'S3Client',
@@ -98,12 +128,15 @@ def upload_single_file(
     file_data = filepath.read_bytes()
     content_type, _ = mimetypes.guess_type(filepath)
 
-    upload_file(
+    cache_control = 'max-age=2592000'
+
+    return upload_file(
         client = client,
         bucket = bucket,
         data = file_data,
         key = key,
         content_type = content_type,
+        cache_control = cache_control,
     )
 
 
@@ -126,6 +159,8 @@ def sync(dist_folder: str | Path):
 
     executor = ThreadPoolExecutor(max_workers = MAX_WORKERS)
 
+    manifest: dict[str, str] = {}
+
     try:
         futures = {
             executor.submit(upload_single_file, client, BUCKET, local, key): key 
@@ -139,11 +174,29 @@ def sync(dist_folder: str | Path):
             progress_task = progress.add_task('Uploading...', total = len(upload_tasks))
             for future in as_completed(futures):
                 progress.advance(progress_task)
+                key = futures[future]
+
+                try:
+                    if key.endswith('.json'):
+                        manifest[key] = future.result()
+                except Exception:
+                    console.print_exception()
+        
     except KeyboardInterrupt:
         executor.shutdown(wait = True, cancel_futures = True)
         console.print('[red]Operation canceled[/]')
     finally:
         executor.shutdown(wait = True)
+    
+    console.print('Uploading manifest')
+
+    client.put_object(
+        Bucket = BUCKET,
+        Key = 'manifest.json',
+        Body = json_dumps_compact(manifest).encode('utf-8'),
+        ContentType = 'application/json',
+        CacheControl = 'no-cache',
+    )
 
 
 """

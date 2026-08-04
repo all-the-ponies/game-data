@@ -1,4 +1,6 @@
+import json
 from typing import Any
+import functools
 
 def strToInt[T](value: Any, default: T = -1) -> int | T:
     try:
@@ -14,3 +16,5 @@ def strToFloat(value: Any, default = 0.0):
 
 def strToBool(value: Any):
     return str(value).lower() in ['1', 't', 'true', '1', 'y', 'yes']
+
+json_dumps_compact = functools.partial(json.dumps, ensure_ascii = False, separators=(",", ":"))
