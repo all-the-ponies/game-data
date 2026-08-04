@@ -129,23 +129,22 @@ def build_cdn(
                     console.print('New content update found!')
                     notifier.notify('content')
 
-                    try:
-                        s3_client.put_object(
-                            Bucket = BUCKET,
-                            Key = 'game_version_checker/current_dlc_manifest.json',
-                            Body = json.dumps(latest_dlc_manifest).encode('utf-8'),
-                            ContentType = 'application/json',
-                        )
-                    except:
-                        console.print('[red]Failed to save dlc_manifest[/]')
-
             except ClientError:
                 console.print('Could not check dlc_manifest')
                 notifier.notify('content')
             
         console.print(f'[green]Found version {version}[/]')
 
-        return # For now to prevent errors when 11.3.0 releases
+        try:
+            s3_client.put_object(
+                Bucket = BUCKET,
+                Key = 'game_version_checker/current_dlc_manifest.json',
+                Body = json.dumps(latest_dlc_manifest).encode('utf-8'),
+                ContentType = 'application/json',
+            )
+        except:
+            console.print('[red]Failed to save dlc_manifest[/]')
+
     else:
         console.print(f'version: {version}')
         
@@ -197,6 +196,13 @@ def build_cdn(
 
     if upload and s3_client:
         sync(dist_folder = dist_dir)
+
+        s3_client.copy_object(
+            Bucket = BUCKET,
+            Key = 'game_version_checker/game_version.json',
+            CopySource = {'Bucket': BUCKET, 'Key': 'game_version.json'},
+            MetadataDirective = 'COPY',
+        )
     
     console.log(f'Time: {(perf_counter() - start_time) / 60:.2f}m')
     
