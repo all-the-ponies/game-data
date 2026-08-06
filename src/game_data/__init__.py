@@ -189,6 +189,9 @@ def build_cdn(
     if upload and s3_client:
         sync(dist_folder = dist_dir)
 
+        api = API('android', version)
+        latest_dlc_manifest = api.get_dlc_manifest()
+
         s3_client.put_object(
             Bucket = BUCKET,
             Key = 'game_version_checker/current_dlc_manifest.json',
