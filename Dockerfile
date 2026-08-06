@@ -12,11 +12,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gir1.2-pango-1.0 \
     libpango1.0-dev \
     gcc \
+    jq \
     && rm -rf /var/lib/apt/lists/*
 
 ENV GI_TYPELIB_PATH=/usr/lib/x86_64-linux-gnu/girepository-1.0
 ENV UV_INSTALL_DIR=/usr/local/bin
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
+RUN curl -L "https://github.com/protocolbuffers/protobuf/releases/download/v35.1/protoc-35.1-linux-x86_64.zip" -o /tmp/protobuf.zip && \
+    unzip /tmp/protobuf.zip -d /root/.local
+
+ENV PATH="/root/.local/bin:$PATH"
 
 WORKDIR /app
 
