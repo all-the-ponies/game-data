@@ -1,10 +1,11 @@
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 import html
+import os
 
 import google_play_scraper as gplay
 from playstoreapi.config import config, getDevicesCodenames, getDevicesReadableNames
-from playstoreapi.googleplay import GooglePlayAPI
+from playstoreapi.googleplay import GooglePlayAPI, LoginError
 import requests
 
 from luna_kit.api import Version
@@ -13,6 +14,7 @@ from .console import console
 
 
 PACKAGE_NAME = "com.gameloft.android.ANMP.GloftPOHM"
+GPLAY_CONFIG_PATH = 'config/gplay.json'
 
 def unescape_text(s: str):
     return html.unescape(s.replace("<br>", "\n"))
@@ -26,7 +28,20 @@ class AppInfo:
 
 def get_gplay_api_details():
     api = GooglePlayAPI('en_US', 'UTC', device_codename = 'gplayapi_px_9a')
-    api.envLogin(config_paths = ['config/gplay.json'], quiet = True)
+    
+    try:
+        api.envLogin(config_paths = [GPLAY_CONFIG_PATH], quiet = True)
+        console.print('Logged into google play')
+        if not os.path.exists(GPLAY_CONFIG_PATH):
+            api.saveConfig(config_path = GPLAY_CONFIG_PATH)
+            console.print(f'[green]Google play api config saved to "{GPLAY_CONFIG_PATH}"[/]')
+            
+    except LoginError:
+        if not os.path.exists(GPLAY_CONFIG_PATH):
+            console.print('[red]Cannot use google play api[/]')
+            return
+        
+        raise
 
     details = api.details(PACKAGE_NAME)
     icon_url: str = ''
@@ -36,8 +51,6 @@ def get_gplay_api_details():
             if image.get('imageUrl'):
                 icon_url = image['imageUrl']
                 break
-
-    console.print('[green]Finished gplay api[/]')
 
     return AppInfo(
         version = details['details']['appDetails']['versionString'],
@@ -84,7 +97,7 @@ def get_app_info():
             threader.submit(get_apkmirror_details),
         ]
 
-        infos = [future.result() for future in futures]
+        infos = filter(lambda details: details is not None, [future.result() for future in futures])
 
     return sorted(
         infos,

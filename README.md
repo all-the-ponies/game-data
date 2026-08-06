@@ -33,3 +33,30 @@ If all of this is too complicated, you can just use the docker container.
 docker build -t game-data . 
 docker run --env-file .env game-data
 ```
+
+
+## Google Play API
+
+This project uses the google play api to find updates as soon as possible, but that does require a google account which I do not provide. You are able to run the script without one though, as it also checks the google play website, it just may not find an update immediately.
+
+The first time you run this, you need to have a token dispenser. See https://gitlab.com/AuroraOSS/aurora-dispenser to self-host.
+
+Set these environment variables
+
+```shell
+export PLAYSTORE_DISPENSER_URL="https://example.com/api/auth" # REPLACE WITH YOUR URL
+export PLAYSTORE_TOKEN='ya29.fooooo' # optional
+export PLAYSTORE_GSFID='1234567891234567890' # optional
+```
+
+After the first run, the login config will be saved to `config/gplay.json`, **keep this file safe**.
+
+Any subsequent runs don't need any environment variables as long as `config/gplay.json` exists.
+
+Here are some additional environment variables you can set up for requests.
+
+```shell
+export HTTP_PROXY='http://localhost:8080'
+export HTTPS_PROXY='http://localhost:8080'
+export CURL_CA_BUNDLE='/usr/local/myproxy_info/cacert.pem'
+```
