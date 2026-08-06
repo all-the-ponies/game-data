@@ -14,7 +14,7 @@ from .console import console
 
 
 PACKAGE_NAME = "com.gameloft.android.ANMP.GloftPOHM"
-GPLAY_CONFIG_PATH = 'config/gplay.json'
+GPLAY_CONFIG_PATH = '.playstoreapi'
 
 def unescape_text(s: str):
     return html.unescape(s.replace("<br>", "\n"))

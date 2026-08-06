@@ -169,4 +169,5 @@ raw/*
 notifications*.json
 notifications/
 resources/
+.playstoreapi
 config/

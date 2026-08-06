@@ -49,9 +49,9 @@ export PLAYSTORE_TOKEN='ya29.fooooo' # optional
 export PLAYSTORE_GSFID='1234567891234567890' # optional
 ```
 
-After the first run, the login config will be saved to `config/gplay.json`, **keep this file safe**.
+After the first run, the login config will be saved to `.playstoreapi`, **keep this file safe**.
 
-Any subsequent runs don't need any environment variables as long as `config/gplay.json` exists.
+Any subsequent runs don't need any environment variables as long as `.playstoreapi` exists.
 
 Here are some additional environment variables you can set up for requests.
 
