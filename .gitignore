@@ -169,3 +169,4 @@ raw/*
 notifications*.json
 notifications/
 resources/
+config/

@@ -78,7 +78,9 @@ def build_cdn(
                 except:
                     console.print('Could not get current version')
         
+        console.print('getting app info')
         app_info = get_app_info()
+        console.print('got app info')
         if version == 'latest':
             latest_version = app_info.version
         else:
