@@ -21,7 +21,7 @@ from .GameDataTypes import (
     GenericObjectType,
 )
 from .console import COLUMNS, console, track
-from .s3 import BUCKET, get_s3_client
+from .s3 import DEFAULT_BUCKET, get_s3_client
 from .utils import json_dumps_compact
 
 if TYPE_CHECKING:
@@ -140,12 +140,12 @@ def upload_single_file(
     )
 
 
-def sync(dist_folder: str | Path):
-    generate_diff(dist_folder)
+def sync(dist_folder: str | Path, bucket: str):
+    generate_diff(dist_folder, bucket)
 
     console.print('Uploading files')
 
-    client = get_s3_client(MAX_WORKERS)
+    client = get_s3_client(bucket, max_workers = MAX_WORKERS)
 
     dist_folder = Path(dist_folder)
 
@@ -163,7 +163,7 @@ def sync(dist_folder: str | Path):
 
     try:
         futures = {
-            executor.submit(upload_single_file, client, BUCKET, local, key): key 
+            executor.submit(upload_single_file, client, DEFAULT_BUCKET, local, key): key 
             for local, key in upload_tasks
         }
         
@@ -191,7 +191,7 @@ def sync(dist_folder: str | Path):
     console.print('Uploading manifest')
 
     client.put_object(
-        Bucket = BUCKET,
+        Bucket = DEFAULT_BUCKET,
         Key = 'manifest.json',
         Body = json_dumps_compact(manifest).encode('utf-8'),
         ContentType = 'application/json',
@@ -231,10 +231,10 @@ type Changelog = dict[
 ]
 
 
-def generate_diff(dist_folder: str | Path):
+def generate_diff(dist_folder: str | Path, bucket: str):
     dist_folder = Path(dist_folder)
     
-    client = get_s3_client()
+    client = get_s3_client(bucket)
 
     with open(dist_folder/'game_version.json', 'r', encoding = 'utf-8') as file:
         current_version = GameVersion.model_validate_json(file.read())
@@ -242,7 +242,7 @@ def generate_diff(dist_folder: str | Path):
     try:
         last_version = GameVersion.model_validate_json(
             client.get_object(
-                Bucket = BUCKET,
+                Bucket = DEFAULT_BUCKET,
                 Key = 'game_version.json',
             )['Body'].read(),
         )
@@ -254,7 +254,7 @@ def generate_diff(dist_folder: str | Path):
     try:
         changelog = json.load(
             client.get_object(
-                Bucket = BUCKET,
+                Bucket = DEFAULT_BUCKET,
                 Key = 'changelog.json',
             )['Body']
         )
@@ -267,7 +267,7 @@ def generate_diff(dist_folder: str | Path):
         try:
             last_game_objects = GameObjects.model_validate_json(
                 client.get_object(
-                    Bucket = BUCKET,
+                    Bucket = DEFAULT_BUCKET,
                     Key = 'game_objects.json',
                 )['Body'].read(),
             )

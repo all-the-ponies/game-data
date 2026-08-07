@@ -26,7 +26,7 @@ from .env import GAME_DATA_ENV_VAR, is_dev, load_env, set_mode
 from .extractor import extract
 from .image_gen import generate_images
 from .notify import Notifier
-from .s3 import BUCKET, get_s3_client
+from .s3 import DEFAULT_BUCKET, get_s3_client
 from .sync import sync, upload_file
 from .transformer import Transformer
 
@@ -41,6 +41,12 @@ def build_cdn(
     ffdec: str = 'ffdec',
     force: bool = False,
 ):
+    BUCKET = os.environ.get('S3_BUCKET')
+    PRIVATE_BUCKET = os.environ.get('PRIVATE_S3_BUCKET')
+
+    if upload and not BUCKET:
+        raise ValueError('Missing S3_BUCKET environment variable')
+
     start_time = perf_counter()
 
     if skip is None:
@@ -52,11 +58,11 @@ def build_cdn(
     extracted_dir = raw_dir/'extracted'
 
     latest_dlc_manifest: DLCManifest | None = None
-    s3_client = get_s3_client() if upload else None
+    s3_client = get_s3_client(BUCKET) if upload and BUCKET else None
 
     notifier = Notifier()
 
-    if s3_client and (version == 'latest' or force):
+    if BUCKET and s3_client and (version == 'latest' or force):
         last_version: GameVersion | None = None
         try:
             version_file = s3_client.get_object(
@@ -79,7 +85,7 @@ def build_cdn(
                     console.print('Could not get current version')
         
         console.print('getting app info')
-        app_info = get_app_info()
+        app_info = get_app_info(bucket = PRIVATE_BUCKET)
         console.print('got app info')
         if version == 'latest':
             latest_version = app_info.version
@@ -186,8 +192,11 @@ def build_cdn(
         console.print('Generating images')
         generate_images(game_data, dist_dir)
 
-    if upload and s3_client:
-        sync(dist_folder = dist_dir)
+    if upload and s3_client and BUCKET:
+        sync(
+            dist_folder = dist_dir,
+            bucket = BUCKET,
+        )
 
         api = API('android', version)
         latest_dlc_manifest = api.get_dlc_manifest()
@@ -323,6 +332,7 @@ def main() -> None:
 
     if is_dev():
         console.print('[red]Currently running in dev environment[/]')
+    
 
     match args.command:
         case 'build':
@@ -341,6 +351,11 @@ def main() -> None:
             console.log(f"Peak Memory Usage: {peak_memory:.2f} MB")
 
         case 'upload':
+            BUCKET = os.environ.get('S3_BUCKET')
+            
+            if not BUCKET:
+                raise ValueError('Cannot upload without S3_BUCKET environment variable')
+            
             input: str = args.input
             key: str = args.key or os.path.basename(input)
 
@@ -364,7 +379,7 @@ def main() -> None:
             console.print(f'Uploading [yellow]{key}[/]')
             
             upload_file(
-                get_s3_client(),
+                get_s3_client(BUCKET),
                 BUCKET,
                 file_data,
                 key,

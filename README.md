@@ -13,6 +13,7 @@ S3_ENDPOINT=http://localhost:3000
 S3_ACCESS_KEY=testing
 S3_SECRET_KEY=testing
 S3_REGION=us-east-1
+S3_BUCKET=all-the-ponies-assets
 ```
 
 To use notifications, use `notifications-example.json` to create the notifications config. Place it in either `notifications.dev.json` for running it in the dev environment, or `notifications.json` for production.
@@ -39,24 +40,22 @@ docker run --env-file .env game-data
 
 This project uses the google play api to find updates as soon as possible, but that does require a google account which I do not provide. You are able to run the script without one though, as it also checks the google play website, it just may not find an update immediately.
 
-The first time you run this, you need to have a token dispenser. See https://gitlab.com/AuroraOSS/aurora-dispenser to self-host.
+To set this up, you need to have a token dispenser. See https://gitlab.com/AuroraOSS/aurora-dispenser to self-host.
 
-Set these environment variables
-
-```shell
-export PLAYSTORE_DISPENSER_URL="https://example.com/api/auth" # REPLACE WITH YOUR URL
-export PLAYSTORE_TOKEN='ya29.fooooo' # optional
-export PLAYSTORE_GSFID='1234567891234567890' # optional
-```
-
-After the first run, the login config will be saved to `.playstoreapi`, **keep this file safe**.
-
-Any subsequent runs don't need any environment variables as long as `.playstoreapi` exists.
-
-Here are some additional environment variables you can set up for requests.
+Set this environment variable
 
 ```shell
-export HTTP_PROXY='http://localhost:8080'
-export HTTPS_PROXY='http://localhost:8080'
-export CURL_CA_BUNDLE='/usr/local/myproxy_info/cacert.pem'
+PLAYSTORE_DISPENSER_URL="https://example.com/api/auth" # REPLACE WITH YOUR URL
 ```
+
+The login config will be saved to `.playstoreapi`. You may also upload this to an s3 bucket if you want, but since this is sensitive, make a private s3 bucket, and set these environment variables.
+
+```shell
+PRIVATE_S3_ENDPOINT=http://localhost:3000
+PRIVATE_S3_ACCESS_KEY=testing
+PRIVATE_S3_SECRET_KEY=testing
+PRIVATE_S3_REGION=us-east-1
+PRIVATE_S3_BUCKET=private-bucket
+```
+
+The s3 bucket is for when you're running this on a system that doesn't have persistent storage.
