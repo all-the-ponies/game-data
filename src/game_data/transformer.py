@@ -13,7 +13,7 @@ from PIL import Image
 from lxml import etree
 
 from luna_kit.gameobjectdata import GameObjectData, ShopItem
-from luna_kit.questtable import QuestManager
+from luna_kit.questtable import QuestManager, QuestTable
 from luna_kit.loc import LOC
 from luna_kit.pvr import PVR
 from luna_kit.swf import swf2webp
@@ -28,7 +28,10 @@ from luna_kit.typings import (
 from luna_kit.typings.defaultGameCampaign import MazeData as GameData_MazeData
 from luna_kit.xml import parse_xml
 
-from .GameDataTypes import *
+from .data_types import GameData
+from .data_types.GameDataTypes import *
+from .data_types import GameDataTypes
+from .data_types import QuestDataTypes
 from .console import console, track
 from .crop import crop_image
 from .utils import strToInt, strToBool
@@ -81,6 +84,8 @@ LOCATIONS: dict[int, Location] = {
     4: 'CRYSTAL_EMPIRE',
     5: 'CHANGELING_KINGDOM',
     6: 'KLUGETOWN',
+    7: 'KLUGETOWN',
+    8: 'MAZE',
 }
 
 CURRENCY = {
@@ -238,6 +243,8 @@ class Transformer:
             self.get_fortune_shop()
             self.get_collections()
             self.get_maze_data()
+
+            self.get_quest_data()
 
             self.apply_overrides()
 
@@ -1700,10 +1707,196 @@ class Transformer:
                 slot['id']
                 for slot in tier_info
             ]
+    
+    def get_quest_data(self):
+        quest_data = self.game_data.quest_data
+
+        quest_icons = self.images_folder/'quests/quests/icon/'
+        giver_icons = self.images_folder/'quests/quests/giver_icon/'
+        giver_images = self.images_folder/'quests/quests/giver_image/'
+        task_icons = self.images_folder/'quests/quests/tasks/'
+
+        category_main_images = self.images_folder/'quests/category/main/'
+        category_outro_images = self.images_folder/'quests/category/outro/'
+        category_reward_images = self.images_folder/'quests/category/reward/'
+
+        for path in [quest_icons,
+                     giver_icons,
+                     giver_images,
+                     task_icons,
+                     category_main_images,
+                     category_outro_images,
+                     category_reward_images]:
+            
+            path.mkdir(parents = True, exist_ok = True)
+        
+        quest_table = QuestTable(self.game_folder/'questtable.xml')
+
+        for category in track(
+            self.quest_manager.values(),
+            description = 'Getting quest categories...',
+        ):
+            category_data = QuestDataTypes.QuestCategory(
+                id = category.name,
+                name = self.add_translation(category.loc_name),
+                final_text = self.add_translation(category.final_text),
+                active_limit = category.active_limit,
+                time_limited = category.time_limited,
+                building = category.building,
+                outro_cinematic = category.outro_cinematic,
+            )
+            quest_data.categories[category_data.id] = category_data
+
+            if category.image:
+                category_data.image['main'] = self.add_image(
+                    [category.image],
+                    category_main_images/f'{category_data.id}.png',
+                )
+            if category.final_image:
+                category_data.image['outro'] = self.add_image(
+                    [category.final_image],
+                    category_outro_images/f'{category_data.id}.png',
+                )
+            if category.reward_icon:
+                category_data.image['reward'] = self.add_image(
+                    [category.reward_icon],
+                    category_reward_images/f'{category_data.id}.png',
+                )
+
+        for quest in track(
+            quest_table.values(),
+            description = 'Getting quests...',
+        ):
+            quest_info = QuestDataTypes.QuestType(
+                id = quest.name,
+                category = quest.category,
+                info = QuestDataTypes.QuestInfo(
+                    title = self.add_translation(quest.info.title),
+                    description = self.add_translation(quest.info.description),
+                    completed_description = self.add_translation(quest.info.complete_description),
+                    skippable = quest.info.skippable,
+                    auto_start = quest.info.auto_start,
+                    global_quest = quest.info.global_quest,
+                    invisible = quest.info.invisible_quest,
+                    add_to_complete_after_start = quest.info.add_to_complete_after_start,
+                    skip_for_COPPA = quest.info.skip_for_COPPA,
+                    skip_for_OFT = quest.info.skip_for_OFT,
+                    location = LOCATIONS.get(quest.info.mapzone, 'UNKNOWN'),
+                    any_quest = quest.info.any_quest,
+                ),
+                rewards = QuestDataTypes.QuestRewards(
+                    bits = quest.rewards.bits,
+                    gems = quest.rewards.gems,
+                    hearts = quest.rewards.hearts,
+                    xp = quest.rewards.xp,
+                    item1 = QuestDataTypes.QuestRewardItem(
+                        id = quest.rewards.item.id,
+                        value = quest.rewards.item.value,
+                        alt_currency = 'Gems',
+                        alt_value = quest.rewards.item.alt_value,
+                        consumable_id = quest.rewards.item.consumable_id,
+                        consumable_count = quest.rewards.item.consumable_count,
+                    ),
+                    item2 = QuestDataTypes.QuestRewardItem(
+                        id = quest.rewards.item2.id,
+                        value = quest.rewards.item2.value,
+                        alt_currency = 'Gems',
+                        alt_value = quest.rewards.item2.alt_value,
+                        consumable_id = quest.rewards.item2.consumable_id,
+                        consumable_count = quest.rewards.item2.consumable_count,
+                    ),
+                ),
+            )
+
+            quest_data.quests[quest_info.id] = quest_info
+
+            for task in quest.task_list:
+                task_entry = QuestDataTypes.QuestTask(
+                    id = task.name,
+                    description = self.add_translation(task.description),
+                    skippable = task.skippable,
+                    skip_for_OFT = task.is_OFT,
+                    skip_cost = task.skip_cost,
+                    ad_skip = not task.no_skip_by_ads,
+                    has_go = task.has_go,
+                )
+
+                if task.counts:
+                    task_entry.objective = QuestDataTypes.QuestTaskObjective(
+                        scope = 'local' if task.counts.type in ['LocalObjectCount', 'LocalCount'] else 'global',
+                        category = task.counts.category,
+                        item = task.counts.sub_object,
+                        value = task.counts.value,
+                    )
+
+                if task.icon:
+                    image_name = os.path.splitext(os.path.basename(task.icon))[0]
+                    task_entry.icon = self.add_image(
+                        [task.icon],
+                        task_icons/f'{image_name}.png',
+                    )
+            
+            quest_info.requirements.any_quest = quest.requirements.any_quest
+            quest_info.requirements.quests_completed = quest.requirements.quests_completed.copy()
+            quest_info.requirements.no_start_zones = [LOCATIONS.get(zone, 'UNKNOWN') for zone in quest.requirements.no_start_zones]
+
+            for count in quest.requirements.global_counts:
+                quest_info.requirements.global_counts.append(QuestDataTypes.GlobalCountRequirement(
+                    category = count.category,
+                    item = count.sub_object,
+                    amount = count.value,
+                ))
+
+            for event in quest.events.start:
+                quest_info.events.start.append(QuestDataTypes.QuestEvent(
+                    type = event.type,
+                    value = event.value,
+                ))
+            for event in quest.events.end:
+                quest_info.events.end.append(QuestDataTypes.QuestEvent(
+                    type = event.type,
+                    value = event.value,
+                ))
+
+            if quest.info.icon:
+                image_name = os.path.splitext(os.path.basename(quest.info.icon))[0]
+                quest_info.info.icon = self.add_image(
+                    [quest.info.icon],
+                    quest_icons/f'{image_name}.png',
+                )
+            if quest.info.giver_icon:
+                image_name = os.path.splitext(os.path.basename(quest.info.giver_icon))[0]
+                quest_info.info.giver_icon = self.add_image(
+                    [quest.info.giver_icon],
+                    giver_icons/f'{image_name}.png',
+                )
+            if quest.info.giver_image:
+                image_name = os.path.splitext(os.path.basename(quest.info.giver_image))[0]
+                quest_info.info.giver_image = self.add_image(
+                    [quest.info.giver_image],
+                    giver_images/f'{image_name}.png',
+                )
 
     
     def translate_string(self, key: str) -> TranslatableString:
         return {lang: loc.translate(key).strip().replace('|', '') for lang, loc in self.locs.items()}
+    
+    def add_translation(self, key: str) -> str:
+        """
+        Add translations to game_data.locales and return the string id
+
+        Args:
+            key (str): String key
+
+        Returns:
+            str: String key
+        """
+
+        translation = self.translate_string(key)
+        for lang, string in translation.items():
+            self.game_data.locales[lang][key] = string
+        
+        return key
     
     def add_image(self, game_paths: list[str], dest: str | Path) -> RenamedFile:
         used_game_name: str | None = None

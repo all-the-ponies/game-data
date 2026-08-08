@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ..GameDataTypes import GameData
+from ..data_types import GameData
 from .collection import CollectionImageGenerator
 
 def generate_images(game_data: GameData, dist: str | Path):

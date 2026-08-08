@@ -12,10 +12,10 @@ import botocore.exceptions
 from botocore.exceptions import ClientError
 from rich.progress import Progress
 
-from .GameDataTypes import (
+from .data_types.common_types import GameObjectId
+from .data_types.GameDataTypes import (
     CATEGORY_NAMES,
     CategoryName,
-    GameObjectId,
     GameObjects,
     GameVersion,
     GenericObjectType,

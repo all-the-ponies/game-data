@@ -13,7 +13,9 @@ gi.require_version("PangoCairo", "1.0")
 from gi.repository import Pango
 from gi.repository import PangoCairo
 
-from ..GameDataTypes import CollectionEntry, GameData, Language
+from ..data_types import GameData
+from ..data_types.common_types import Language
+from ..data_types.GameDataTypes import CollectionEntry
 from ..console import console, track
 
 font_config = ctypes.CDLL(ctypes.util.find_library("fontconfig"))

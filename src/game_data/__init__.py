@@ -17,7 +17,8 @@ from botocore.exceptions import ClientError
 from luna_kit.api import API, Version
 from luna_kit.typings import DLCManifest
 
-from .GameDataTypes import GameData, GameVersion
+from .data_types import GameData
+from .data_types.GameDataTypes import GameVersion
 from .app_info import get_app_info
 from .console import console
 from .crop import crop_image
