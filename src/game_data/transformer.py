@@ -32,6 +32,7 @@ from .data_types import GameData
 from .data_types.GameDataTypes import *
 from .data_types import GameDataTypes
 from .data_types import QuestDataTypes
+from .data_types.common_types import LANGUAGES
 from .console import console, track
 from .crop import crop_image
 from .utils import strToInt, strToBool
