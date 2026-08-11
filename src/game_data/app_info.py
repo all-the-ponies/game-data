@@ -82,11 +82,13 @@ def get_gplay_api(bucket: str | None):
         console.print('Logged into google play')
         
             
-    except LoginError:
+    except LoginError as e:
         if not dispenser_url:
             console.print('[red]Cannot use google play api[/]')
             return
         
+        e.add_note(f'Dispenser: {dispenser_url}')
+
         raise
     
     config = {
