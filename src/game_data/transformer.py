@@ -16,7 +16,7 @@ from luna_kit.gameobjectdata import GameObjectData, ShopItem
 from luna_kit.questtable import QuestManager, QuestTable
 from luna_kit.loc import LOC
 from luna_kit.pvr import PVR
-from luna_kit.swf import swf2webp
+from luna_kit.swf import SWF
 from luna_kit.typings import (
     DefaultGameCampaignType,
     FusionData,
@@ -153,6 +153,17 @@ def _transform_image(src: str | Path, dest: str | Path):
         image.save(dest)
     else:
         console.print(f'[red]Could not load {src}[/]')
+
+
+def swf2webp(input: str | Path, output: str | Path, *, ffdec_path: str = 'ffdec'):
+    input = Path(input)
+    console.print(f'[yellow]{input.name}[/yellow]: Loading')
+    swf = SWF(input, ffdec = ffdec_path)
+    console.print(f'[yellow]{input.name}[/yellow]: Fixing')
+    swf.fix()
+    console.print(f'[yellow]{input.name}[/yellow]: Rendering')
+    swf.render_webp(output)
+    console.print(f'[yellow]{input.name}[/yellow]: Saved')
 
 
 class Transformer:
@@ -1949,7 +1960,6 @@ class Transformer:
                 swf2webp,
                 self.game_folder/game_path,
                 dest,
-                console = console,
                 ffdec_path = self.ffdec,
             )
             self._image_futures.append(future)
