@@ -63,6 +63,8 @@ def build_cdn(
 
     notifier = Notifier()
 
+    success: bool = True
+
     if BUCKET and s3_client and (version == 'latest' or force):
         last_version: GameVersion | None = None
         try:
@@ -133,7 +135,7 @@ def build_cdn(
 
                 if last_dlc_manifest == latest_dlc_manifest:
                     console.print('[green]All up to date![/]')
-                    return
+                    return True
                 else:
                     console.print('New content update found!')
                     notifier.notify('content')
@@ -165,39 +167,53 @@ def build_cdn(
 
     if 'extract' not in skip:
         console.print('Extracting files')
-        extract(arks_dir, extracted_dir)
+        try:
+            extract(arks_dir, extracted_dir)
+        except:
+            console.print_exception()
+            console.print('[red]Failed to extract files[/]')
+            success = False
 
         console.line()
 
-    game_data: GameData | None = None
-    
-    if 'transform' not in skip:
-        console.print('Transforming data')
-        transformer = Transformer(
-            extracted_dir,
-            dist_dir,
-            overrides_dir,
-            version,
-            ffdec = ffdec,
-        )
+    if success:
+        game_data: GameData | None = None
+        
+        if 'transform' not in skip:
+            console.print('Transforming data')
+            transformer = Transformer(
+                extracted_dir,
+                dist_dir,
+                overrides_dir,
+                version,
+                ffdec = ffdec,
+            )
 
-        transformer.start()
-        transformer.save()
-        game_data = transformer.game_data
+            transformer.start()
+            transformer.save()
+            game_data = transformer.game_data
 
-        console.line()
-    else:
-        game_data = GameData.load(dist_dir)
+            console.line()
+        else:
+            game_data = GameData.load(dist_dir)
 
-    if game_data and 'image_gen' not in skip:
-        console.print('Generating images')
-        generate_images(game_data, dist_dir)
+        if game_data and 'image_gen' not in skip:
+            console.print('Generating images')
+            generate_images(game_data, dist_dir)
 
     if upload and s3_client and BUCKET:
-        sync(
-            dist_folder = dist_dir,
-            bucket = BUCKET,
-        )
+        if success:
+            sync(
+                dist_folder = dist_dir,
+                bucket = BUCKET,
+            )
+
+            s3_client.copy_object(
+                Bucket = BUCKET,
+                Key = 'game_version_checker/game_version.json',
+                CopySource = {'Bucket': BUCKET, 'Key': 'game_version.json'},
+                MetadataDirective = 'COPY',
+            )
 
         api = API('android', version)
         latest_dlc_manifest = api.get_dlc_manifest()
@@ -208,15 +224,10 @@ def build_cdn(
             Body = json.dumps(latest_dlc_manifest).encode('utf-8'),
             ContentType = 'application/json',
         )
-
-        s3_client.copy_object(
-            Bucket = BUCKET,
-            Key = 'game_version_checker/game_version.json',
-            CopySource = {'Bucket': BUCKET, 'Key': 'game_version.json'},
-            MetadataDirective = 'COPY',
-        )
     
     console.log(f'Time: {(perf_counter() - start_time) / 60:.2f}m')
+
+    return success
     
 
 def create_argparser():
@@ -322,7 +333,7 @@ def create_argparser():
 
     return argparser
 
-def main() -> None:
+def main() -> bool | None:
     argparser = create_argparser()
 
     args = argparser.parse_args()
@@ -337,7 +348,7 @@ def main() -> None:
 
     match args.command:
         case 'build':
-            build_cdn(
+            return not build_cdn(
                 raw_dir = args.raw,
                 dist_dir = args.output,
                 version = args.version,
