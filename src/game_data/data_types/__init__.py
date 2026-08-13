@@ -18,6 +18,7 @@ from .GameDataTypes import (
 )
 from .common_types import GameObjectId, LANGUAGES, Language
 from . import QuestDataTypes
+from . import CinematicTypes
 
 @dataclass
 class GameData:
@@ -30,6 +31,7 @@ class GameData:
     maze_data: MazeData = field(default_factory = MazeData)
 
     quest_data: QuestDataTypes.QuestData = field(default_factory = QuestDataTypes.QuestData)
+    cinematic_data: CinematicTypes.CinematicData = field(default_factory = CinematicTypes.CinematicData)
 
     locales: dict[Language, dict[str, str]] = field(default_factory = lambda: {lang: {} for lang in LANGUAGES})
 
@@ -60,6 +62,8 @@ class GameData:
 
         with open(dist_folder/'quest_data.json', 'w', encoding = 'utf-8') as file:
             file.write(self.quest_data.model_dump_json(ensure_ascii = False, indent = 2))
+        with open(dist_folder/'cinematic_data.json', 'w', encoding = 'utf-8') as file:
+            file.write(self.cinematic_data.model_dump_json(ensure_ascii = False, indent = 2))
     
     @classmethod
     def load(cls, dist_folder: str | Path):
@@ -83,6 +87,7 @@ class GameData:
         collection_data = CollectionData.model_validate_json((dist_folder/'collection_data.json').read_bytes())
         maze_data = MazeData.model_validate_json((dist_folder/'maze_data.json').read_bytes())
         quest_data = QuestDataTypes.QuestData.model_validate_json((dist_folder/'quest_data.json').read_bytes())
+        cinematic_data = CinematicTypes.CinematicData.model_validate_json((dist_folder/'cinematic_data.json').read_bytes())
         
         return cls(
             game_version = game_version,
@@ -94,6 +99,7 @@ class GameData:
             maze_data = maze_data,
 
             quest_data = quest_data,
+            cinematic_data = cinematic_data,
 
             locales = locales,
         )

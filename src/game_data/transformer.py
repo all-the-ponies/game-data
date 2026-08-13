@@ -2,40 +2,43 @@ from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass, field
 from glob import glob
 import json
+import math
 import os
 from pathlib import Path
 import re
 from typing import Literal, TypedDict
 import urllib.parse
-import math
 
 from PIL import Image
 from lxml import etree
+from rich.progress import Progress
 
+from luna_kit.cinematictable import CinematicTable
 from luna_kit.gameobjectdata import GameObjectData, ShopItem
-from luna_kit.questtable import QuestManager, QuestTable
 from luna_kit.loc import LOC
 from luna_kit.pvr import PVR
+from luna_kit.questtable import QuestManager, QuestTable
 from luna_kit.swf import SWF
 from luna_kit.typings import (
+    ArenaQTESettingsType,
     DefaultGameCampaignType,
     FusionData,
     GroupQuestsType,
     PonyTasksType,
     PrizeTypes,
-    ArenaQTESettingsType,
 )
 from luna_kit.typings.defaultGameCampaign import MazeData as GameData_MazeData
 from luna_kit.xml import parse_xml
 
+from .console import console, track, COLUMNS
+from .crop import crop_image
 from .data_types import GameData
-from .data_types.GameDataTypes import *
 from .data_types import GameDataTypes
 from .data_types import QuestDataTypes
+from .data_types import CinematicTypes
+from .data_types.GameDataTypes import *
 from .data_types.common_types import LANGUAGES
-from .console import console, track
-from .crop import crop_image
-from .utils import strToInt, strToBool
+from .utils import strToBool, strToInt
 
 
 class ObjectOverride(TypedDict):
@@ -257,6 +260,7 @@ class Transformer:
             self.get_maze_data()
 
             self.get_quest_data()
+            self.get_dialogue()
 
             self.apply_overrides()
 
@@ -1888,6 +1892,91 @@ class Transformer:
                     [quest.info.giver_image],
                     giver_images/f'{image_name}.png',
                 )
+
+
+    def get_dialogue(self):
+        cinematic_table = CinematicTable(
+            self.game_folder/'cinematictable.xml',
+            self.game_folder/'cinematicmanager.xml'
+        )
+
+        participants: dict[str, str] = {}
+        images: dict[str, dict[str, Path]] = {} # dict[swf, set[label]]
+
+        images_path = self.images_folder/'dialogue'
+
+        def add_line_image(flash_id: str, label: str):
+            path = images_path / Path(flash_id).stem / f'{label}.png'
+            key = path.relative_to(self.output_folder).as_posix()
+
+            images.setdefault(flash_id, {})[label] = path
+            return RenamedFile(
+                path = key,
+                original = label,
+            )
+
+        for scene in track(
+            cinematic_table.values(),
+            description = 'Getting dialogue',
+        ):
+            flash_id = scene.flash_id or 'conversationmanager.swf'
+            scene_data = CinematicTypes.CinematicType(
+                id = scene.name,
+            )
+            self.game_data.cinematic_data.cinematics[scene.name] = scene_data
+
+            for event in scene.events:
+                if event.name == 'ConvoAddParticipant':
+                    name = event.parameters['Participant']['Name']
+                    id = event.parameters['Pony']['PonyID']
+                    participants[str(name)] = str(id)
+                elif event.name == 'ConvoTalk':
+                    name = str(event.parameters['Talk']['Name'])
+                    label = participants.get(name, name)
+                    line = str(event.parameters['Talk']['Text_Local'])
+
+                    scene_data.lines.append(CinematicTypes.CinematicLine(
+                        image = add_line_image(flash_id, label),
+                        line = self.add_translation(line),
+                    ))
+                elif event.name == 'CinematicLine':
+                    name = str(event.parameters['LineSettings']['PonyID'])
+                    label = participants.get(name, name)
+                    line = str(event.parameters['LineSettings']['Text_Local'])
+
+                    scene_data.lines.append(CinematicTypes.CinematicLine(
+                        image = add_line_image(flash_id, label),
+                        line = self.add_translation(line),
+                    ))
+
+        with Progress(
+            *COLUMNS,
+            console = console,
+        ) as progress:
+            task = progress.add_task(
+                description = 'Getting dialogue images...',
+                total = sum(len(labels) for labels in images.values()),
+            )
+
+            for flash_id, labels in images.items():
+                swf_path = self.game_folder/'swf'/flash_id
+                if not swf_path.is_file():
+                    console.print(f'[red]Cannot find {flash_id}[/]')
+                    progress.advance(task, len(labels))
+                    continue
+
+                
+                with SWF(swf_path, ffdec = self.ffdec) as swf:
+                    for label, path in labels.items():
+                        path.parent.mkdir(parents = True, exist_ok = True)
+                        image = swf.get_portrait(label)
+                        if image is not None:
+                            image = crop_image(image)
+                            image.save(path)
+                        else:
+                            console.print(f'[red]Cannot render label {flash_id}/{label}')
+
+                        progress.advance(task)
 
     
     def translate_string(self, key: str) -> TranslatableString:
