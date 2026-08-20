@@ -60,11 +60,11 @@ class QuestTask(BaseModel):
     objective: QuestTaskObjective | None = None
 
 class QuestRewardItem(BaseModel):
-    id: str = ''
+    id: GameObjectId = ''
     value: int = 0
     alt_currency: Currency = 'Gems'
     alt_value: int = 0
-    consumable_id: str = ''
+    consumable_id: GameObjectId = ''
     consumable_count: int = 0
 
 class QuestRewards(BaseModel):
@@ -88,9 +88,15 @@ class QuestType(BaseModel):
     category: str
     info: QuestInfo = Field(default_factory = QuestInfo)
     requirements: QuestRequirements = Field(default_factory = QuestRequirements)
+    next: list[str] = Field(default_factory = list)
     tasks: list[QuestTask] = Field(default_factory = list)
     rewards: QuestRewards = Field(default_factory = QuestRewards)
     events: QuestEvents = Field(default_factory = QuestEvents)
+
+class QuestCategoryConnections(BaseModel):
+    start: list[str] = Field(default_factory = list)
+    depends: list[str] = Field(default_factory = list)
+    unlocks: list[str] = Field(default_factory = list)
 
 
 class QuestCategory(BaseModel):
@@ -102,6 +108,7 @@ class QuestCategory(BaseModel):
     image: ImageBase[Literal['outro', 'reward']] = Field(default_factory = dict)
     building: GameObjectId | None = None
     outro_cinematic: CinematicId | None = None
+    connections: QuestCategoryConnections = Field(default_factory = QuestCategoryConnections)
 
 
 class QuestData(BaseModel):

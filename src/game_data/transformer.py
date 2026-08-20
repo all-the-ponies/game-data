@@ -1892,6 +1892,29 @@ class Transformer:
                     [quest.info.giver_image],
                     giver_images/f'{image_name}.png',
                 )
+        
+        for quest in quest_data.quests.values():
+            not_first = False
+
+            for id in quest.requirements.quests_completed:
+                if id in quest_data.quests:
+                    previous = quest_data.quests[id]
+                    not_first = not_first or quest.category == previous.category
+                    previous.next.append(quest.id)
+
+                    if quest.category != previous.category:
+                        if (previous_category := quest_data.categories.get(previous.category)):
+                            if quest.id not in previous_category.connections.unlocks:
+                                previous_category.connections.unlocks.append(quest.id)
+                        
+                        if (current_category := quest_data.categories.get(quest.category)):
+                            if previous.id not in current_category.connections.depends:
+                                current_category.connections.depends.append(previous.id)
+                        
+
+            if not not_first:
+                if (category := quest_data.categories.get(quest.category)):
+                    category.connections.start.append(quest.id)
 
 
     def get_dialogue(self):
