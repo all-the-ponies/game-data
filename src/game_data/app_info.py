@@ -1,13 +1,14 @@
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 import html
+import json
 import os
+import time
 
 import google_play_scraper as gplay
 from playstoreapi.config import config, getDevicesCodenames, getDevicesReadableNames
 from playstoreapi.googleplay import GooglePlayAPI, LoginError
 import requests
-import json
 
 from luna_kit.api import Version
 
@@ -29,6 +30,33 @@ class AppInfo:
     release_notes: str
     raw_release_notes: str
     icon_url: str
+
+def _gplay_login_with_retry(
+    api: GooglePlayAPI,
+    dispenser_url: str,
+    max_retries: int = 5,
+    base_delay: float = 2.0,
+) -> bool:
+    # Retry to handle cold starts on free render hosting
+    
+    last_exc = None
+    for attempt in range(max_retries):
+        try:
+            api.login(anonymous = True, tokenDispenser = dispenser_url)
+            return True
+        except LoginError as e:
+            last_exc = e
+            if '502' not in str(e):
+                raise  # not a transient dispenser-cold-start error, bail immediately
+
+            if attempt < max_retries - 1:
+                delay = base_delay * (2 ** attempt)
+                console.print(f'[yellow]Dispenser returned 502, retrying in {delay:.0f}s (attempt {attempt + 1}/{max_retries})[/]')
+                time.sleep(delay)
+
+    if last_exc is not None:
+        raise last_exc
+    return False
 
 def get_gplay_api(bucket: str | None):
     api = GooglePlayAPI('en_US', 'UTC', device_codename = 'gplayapi_px_9a')
@@ -71,10 +99,7 @@ def get_gplay_api(bucket: str | None):
                 pass
 
         if not logged_in and dispenser_url:
-            api.login(
-                anonymous = True,
-                tokenDispenser = dispenser_url,
-            )
+            _gplay_login_with_retry(api, dispenser_url)
         elif not api.gsfId:
             console.print('Cannot log into google play')
             return
