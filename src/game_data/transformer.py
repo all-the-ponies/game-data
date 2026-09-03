@@ -1552,6 +1552,9 @@ class Transformer:
                         if item.item not in self.game_data.game_objects.pony.objects:
                             continue
                         self.game_data.game_objects.pony.objects[item.item].collections.append(collection_id)
+                    
+                    if rewards.main.item in self.game_data.game_objects.pony.objects:
+                        self.game_data.game_objects.pony.objects[rewards.main.item].collections.append(collection_id)
                 
             except Exception as e:
                 e.add_note(f'Collections: {collection_id}')
