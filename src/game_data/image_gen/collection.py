@@ -31,6 +31,7 @@ class CollectionImageGenerator:
         'Quark': 'QuarkBold.ttf',
         'Tajawal': 'TajawalBold.ttf',
         'WenQuanYi Micro Hei': 'Wqymicrohei.ttf',
+        'Noto Naskh Arabic': 'NotoSansArabic-Medium-ArabicOnly.ttf',
     }
 
     LANGUAGE_FONTS: dict[Language, str] = {
@@ -39,14 +40,14 @@ class CollectionImageGenerator:
         'german': 'Celestia Redux',
         'italian': 'Celestia Redux',
         'spanish': 'Celestia Redux',
-        'japanese': 'Noto Sans JP',
-        'korean': 'Eunjin',
-        'chinese': 'WenQuanYi Micro Hei',
+        'japanese': 'Celestia Redux, Noto Sans JP',
+        'korean': 'Celestia Redux, Eunjin',
+        'chinese': 'Celestia Redux, WenQuanYi Micro Hei',
         'brazilian portuguese': 'Celestia Redux',
         'russian': 'Celestia Redux',
         'turkish': 'Celestia Redux',
-        'arabic': 'Tajawal',
-        'thai': 'Quark',
+        'arabic': 'Noto Naskh Arabic, Celestia Redux',
+        'thai': 'Celestia Redux, Quark',
     }
 
     PORTRAIT_SIZE = (200, 160)
@@ -116,7 +117,7 @@ class CollectionImageGenerator:
             font_family = 'Celestia Redux'
 
             if (self.LANGUAGE_FONTS[language] != font_family):
-                font_family += f', {self.LANGUAGE_FONTS[language]}'
+                font_family = self.LANGUAGE_FONTS[language]
 
             
             self.draw_text(
