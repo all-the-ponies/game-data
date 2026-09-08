@@ -821,8 +821,9 @@ class Transformer:
                     },
                     is_default = cutie_mark.get('Settings', {}).get('IsDefault', False),
                     pony = cutie_mark.get('Settings', {}).get('PonyStarsID', ''),
+                    is_reward = bool(cutie_mark.get('Settings', {}).get('PonyStarsID', '')),
                 )
-                
+
                 cutie_marks[cutie_mark.id] = cutie_mark_info
 
                 shop_data = self.gameObjectData.get_object_shopdata(cutie_mark.id)
@@ -1329,10 +1330,14 @@ class Transformer:
         self.game_data.group_quests.quests['GQ_0_Tutorial'].special = 'tutorial'
 
     def get_fortune_shop(self):
-        fortune_shop_data = self.defaultGameCampaign.get('global_defines', {}).get(
-            'fortune_shop_data',
-            self.defaultGameCampaign.get('global_defines', {}).get('personal_shop_data')
-        )
+        if (self.game_folder/'fortuneshopdata.json').exists():
+            with open(self.game_folder/'fortuneshopdata.json', 'r') as file:
+                fortune_shop_data = json.load(file)
+        else:
+            fortune_shop_data = self.defaultGameCampaign.get('global_defines', {}).get(
+                'fortune_shop_data',
+                self.defaultGameCampaign.get('global_defines', {}).get('personal_shop_data')
+            )
 
         console.print('Getting fortune shop')
 
