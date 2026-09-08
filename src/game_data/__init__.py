@@ -120,6 +120,9 @@ def build_cdn(
                 )
             except:
                 console.print('[red]Failed to save dlc_manifest[/]')
+        elif Version.parse(latest_version) < Version.parse(last_version.game_version):
+            console.print('[green]All up to date![/]')
+            return True
         else:
             api = API('android', last_version.game_version)
 
