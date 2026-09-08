@@ -1606,5 +1606,115 @@
         "unused"
       ]
     }
+  },
+  "cutie_mark": {
+    "PlayerCardCutieMark_1_Twilight": {
+      "pony": "Pony_Twilight_Sparkle"
+    },
+    "PlayerCardCutieMark_3_Rarity": {
+      "pony": "Pony_Rarity"
+    },
+    "PlayerCardCutieMark_2_Fluttershy": {
+      "pony": "Pony_Fluttershy"
+    },
+    "PlayerCardCutieMark_4_Rainbow_Dash": {
+      "pony": "Pony_Rainbow_Dash"
+    },
+    "PlayerCardCutieMark_5_Pinkie_Pie": {
+      "pony": "Pony_Pinkie_Pie"
+    },
+    "PlayerCardCutieMark_6_Applejack": {
+      "pony": "Pony_Applejack"
+    },
+    "PlayerCardCutieMark_7_Luna": {
+      "pony": "Pony_Princess_Luna"
+    },
+    "PlayerCardCutieMark_8_Cadence": {
+      "pony": "Pony_Princess_Cadence"
+    },
+    "PlayerCardCutieMark_8_Celestia": {
+      "pony": "Pony_Princess_Celestia"
+    },
+    "PlayerCardCutieMark_10_Flam": {
+      "pony": "Pony_Flam"
+    },
+    "PlayerCardCutieMark_11_Flim": {
+      "pony": "Pony_Flim"
+    },
+    "PlayerCardCutieMark_12_Forsythia": {
+      "pony": "Pony_Forsythia"
+    },
+    "PlayerCardCutieMark_13_Sunburst": {
+      "pony": "Pony_Sunburst"
+    },
+    "PlayerCardCutieMark_14_Starlight": {
+      "pony": "Pony_Starlight_Glimmer"
+    },
+    "PlayerCardCutieMark_16_Treasure_Chest": {
+      "pony": "Pony_Treasure_Hunting_Foal"
+    },
+    "PlayerCardCutieMark_17_Bulk_Bicepc": {
+      "pony": "Pony_Bulk_Biceps"
+    },
+    "PlayerCardCutieMark_18_Alley_Way": {
+      "pony": "Pony_Allie_Way"
+    },
+    "PlayerCardCutieMark_19_Alicorn_Big_Mac": {
+      "pony": "Pony_Big_Mac"
+    },
+    "PlayerCardCutieMark_20_Mad_Scientist_Pony": {
+      "pony": "Pony_Mad_Scientist_Pony"
+    },
+    "PlayerCardCutieMark_21_Sharp_Dressed_Pony": {
+      "pony": "Pony_Sharp_Dressed_Pony"
+    },
+    "PlayerCardCutieMark_22_Burglar_Trixie": {
+      "pony": "Pony_Trixie"
+    },
+    "PlayerCardCutieMark_23_Officer_Trotter": {
+      "pony": "Pony_Officer_Trotter"
+    },
+    "PlayerCardCutieMark_24_Manehattan_Musician": {
+      "pony": "Pony_Manehattan_Musician"
+    },
+    "PlayerCardCutieMark_25_Chipper_Papercolt": {
+      "pony": "Pony_Chipper_Papercolt"
+    },
+    "PlayerCardCutieMark_26_Kind_Salespony": {
+      "pony": "Pony_Kind_Salespony"
+    },
+    "PlayerCardCutieMark_27_Crystal_Dj_Pon3": {
+      "pony": "Pony_Dj_Pon3"
+    },
+    "PlayerCardCutieMark_28_Crystal_Shining_Armor": {
+      "pony": "Pony_Shining_Armour"
+    },
+    "PlayerCardCutieMark_29_Mayor_Mare": {
+      "pony": "Pony_Mayor"
+    },
+    "PlayerCardCutieMark_30_Anxious_Citizen": {
+      "pony": "Pony_Anxious_Citizen"
+    },
+    "PlayerCardCutieMark_31_Reindeer": {
+      "pony": "Pony_Muffins"
+    },
+    "PlayerCardCutieMark_32_Skeptical_Filly": {
+      "pony": "Pony_Skeptical_Filly"
+    },
+    "PlayerCardCutieMark_33_Aria_Blaze": {
+      "pony": "Pony_Aria_Blaze"
+    },
+    "PlayerCardCutieMark_34_Adagio_Dazzle": {
+      "pony": "Pony_Adagio_Dazzle"
+    },
+    "PlayerCardCutieMark_35_Sonata_Dusk": {
+      "pony": "Pony_Sonata_Dusk"
+    },
+    "PlayerCardCutieMark_36_Sunset_Shimmer": {
+      "pony": "Pony_Sunsetshimmer"
+    },
+    "PlayerCardCutieMark_37_Wonderbolts": {
+      "pony": "Pony_Soarin"
+    }
   }
 }

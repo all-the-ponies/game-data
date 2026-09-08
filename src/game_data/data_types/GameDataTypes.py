@@ -180,6 +180,7 @@ class CutieMarkType(GenericObjectType):
     category: Literal["cutie_mark"] = "cutie_mark"
     pony: GameObjectId = ""
     is_default: bool = False
+    is_reward: bool = False
 
 
 class PetType(GenericObjectType):
