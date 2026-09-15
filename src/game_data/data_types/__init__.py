@@ -4,6 +4,8 @@ import json
 import os
 from pathlib import Path
 
+from . import QuestDataTypes
+from . import CinematicTypes
 from .GameDataTypes import (
     CATEGORY_NAMES,
     CategoryData,
@@ -13,12 +15,10 @@ from .GameDataTypes import (
     GameObjects,
     GameVersion,
     GroupQuests,
-    MazeData,
     TasksData,
 )
+from .MazeDataTypes import MazeData
 from .common_types import GameObjectId, LANGUAGES, Language
-from . import QuestDataTypes
-from . import CinematicTypes
 
 @dataclass
 class GameData:

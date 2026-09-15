@@ -36,6 +36,7 @@ from .data_types import GameData
 from .data_types import GameDataTypes
 from .data_types import QuestDataTypes
 from .data_types import CinematicTypes
+from .data_types import MazeDataTypes
 from .data_types.GameDataTypes import *
 from .data_types.common_types import LANGUAGES
 from .utils import strToBool, strToInt
@@ -1585,14 +1586,20 @@ class Transformer:
         
         arena_presets = {preset['ID']: preset for preset in arena_qt_settings['Presets']}
 
+        with open(self.game_folder/'mazesettings.json', 'r', encoding = 'utf-8') as file:
+            maze_settings: dict = json.load(file)['Parameters'][0]
+
+        event_id: str = maze_settings['TLS_ID']
+        mapzone: int = maze_settings['MapZone']
         
-        maze_save = parse_xml(self.game_folder/'initial_pony_save_8.xml')[0][0]
+        maze_save = parse_xml(self.game_folder/f'initial_pony_save_{mapzone}.xml')[0][0]
         initial_objects = maze_save.find('Inital_Objects')
         if initial_objects is None:
             raise ValueError('Cannot find initial maze objects')
         
-        maze_quest_info = self.quest_manager['UPD59_Maze_TLS']
-        self.game_data.maze_data.id = maze_quest_info.name
+        
+        maze_quest_info = self.quest_manager[event_id]
+        self.game_data.maze_data.id = event_id
         self.game_data.maze_data.name = self.translate_string(maze_quest_info.loc_name)
         self.game_data.maze_data.image = {
             'main': self.add_image(
@@ -1604,6 +1611,13 @@ class Transformer:
                 outro_images/f'{maze_quest_info.name}.png',
             ),
         }
+
+        self.game_data.maze_data.settings = MazeDataTypes.MazeSettings(
+            tile_energy = maze_settings.get('MoveEnergyCost', 30),
+            battle_energy = maze_settings.get('BattleEnergy', 15),
+            max_energy = maze_settings.get('MaxEnergy', 300),
+            energy_cooldown = maze_settings.get('RestoreEnergyCooldown', 114),
+        )
         
         for object_category in initial_objects:
             if object_category.tag == 'Pony_House_Objects':
@@ -1615,12 +1629,16 @@ class Transformer:
                         continue
                     
                     self.game_data.maze_data.map.shops.append(
-                        MazeMapShop(
+                        MazeDataTypes.MazeMapShop(
                             id = house_id,
                             x = strToInt(position_el.attrib['x']),
                             y = strToInt(position_el.attrib['y']),
                         )
                     )
+
+                    if house_id in self.game_data.game_objects.shop.objects:
+                        self.game_data.game_objects.shop.objects[house_id].location = 'MAZE'
+
             elif object_category.tag == 'MazeBlock_Objects':
                 for block_el in track(object_category, description = 'Getting maze map...'):
                     block_id = block_el.attrib['ID']
@@ -1636,7 +1654,7 @@ class Transformer:
                         console.print(f'Cannot find position for {block_id}')
                         continue
 
-                    block = MazeMapBlock(
+                    block = MazeDataTypes.MazeMapBlock(
                         id = block_id,
                         x = strToInt(position_el.get('x')),
                         y = strToInt(position_el.get('y')),
@@ -1650,7 +1668,7 @@ class Transformer:
                     )
 
                     if entity_el is not None:
-                        block.entity = MazeBlockEntity(
+                        block.entity = MazeDataTypes.MazeBlockEntity(
                             id = entity_el.attrib['ID'],
                             type = entity_el.attrib['Type'], # type: ignore
                         )
@@ -1661,7 +1679,7 @@ class Transformer:
             self.gameObjectData['MazePony'].values(),
             description = 'Getting maze ponies...'
         ):
-            self.game_data.maze_data.ponies[maze_pony.id] = MazePony(
+            self.game_data.maze_data.ponies[maze_pony.id] = MazeDataTypes.MazePony(
                 id = maze_pony.id,
                 pony = maze_pony.get('Parent', {}).get('PonyName', ''),
                 power = maze_pony.get('Stats', {}).get('DamagePower', 0),
@@ -1674,16 +1692,15 @@ class Transformer:
             self.gameObjectData['MazeBoss'].values(),
             description = 'Getting maze bosses...'
         ):
-            self.game_data.maze_data.bosses[maze_boss.id] = MazeBoss(
+            self.game_data.maze_data.bosses[maze_boss.id] = MazeDataTypes.MazeBoss(
                 id = maze_boss.id,
                 pony = maze_boss.get('Parent', {}).get('PonyName', ''),
                 required_power = math.ceil(maze_boss.get('Stats', {}).get('Hits', 0) / arena_presets.get(maze_boss.get('Fights', {}).get('QTEPreset', ''), {}).get('ActionHitsNum', 1)),
                 hp = maze_boss.get('Stats', {}).get('Hits', 0),
-                required_energy = maze_boss.get('Stats', {}).get('RequiredEnergy', 0),
                 critical_multiplier = maze_boss.get('Stats', {}).get('CritMultiplier', 0),
                 drop_chest = maze_boss.get('Fights', {}).get('DropChest', ''),
                 rewards = [
-                    MazeBossReward(
+                    MazeDataTypes.MazeBossReward(
                         item = item,
                         amount = amount,
                     )
@@ -1699,7 +1716,7 @@ class Transformer:
             self.gameObjectData['MazeChest'].values(),
             description = 'Getting maze chests...'
         ):
-            self.game_data.maze_data.chests[maze_shop.id] = MazeChest(
+            self.game_data.maze_data.chests[maze_shop.id] = MazeDataTypes.MazeChest(
                 id = maze_shop.id,
                 tier = maze_shop.get('Rewards', {}).get('TierID', ''),
             )
@@ -1709,16 +1726,16 @@ class Transformer:
             self.gameObjectData['MazeShop'].values(),
             description = 'Getting maze shops...'
         ):
-            self.game_data.maze_data.shops[maze_shop.id] = MazeShop(
+            self.game_data.maze_data.shops[maze_shop.id] = MazeDataTypes.MazeShop(
                 id = maze_shop.id,
                 tier = maze_shop.get('Display', {}).get('TierID', ''),
             )
         
         for tier_id, tier_info in maze_data['MazePonyPrice'].items():
-            self.game_data.maze_data.shop_tiers[tier_id] = MazeShopTier(
+            self.game_data.maze_data.shop_tiers[tier_id] = MazeDataTypes.MazeShopTier(
                 id = tier_id,
                 slots = [
-                    MazeShopSlot(
+                    MazeDataTypes.MazeShopSlot(
                         id = slot[0].get('id', ''),
                         price = slot[0].get('price', ''),
                     )
@@ -1731,6 +1748,59 @@ class Transformer:
                 slot['id']
                 for slot in tier_info
             ]
+        
+        self.game_data.maze_data.community.token = maze_settings['LeaderboardCurrency']
+        
+        bosses = {boss['ID']: boss for boss in maze_settings['Bosses']}
+
+        base_points: int | None = None
+
+        for comm_helper in maze_settings['LeaderboardBosses']:
+            boss_id: str = comm_helper['BossId']
+            boss = bosses.get(boss_id)
+            if boss is None:
+                console.print(f'[red]Cannot find boss {boss_id}[/]')
+                continue
+
+            preset_id: str = boss['QTEPreset']
+            preset = arena_presets.get(preset_id)
+            if preset is None:
+                console.print(f'[red]Cannot find preset {preset_id}[/]')
+                continue
+
+            leaderboard_loot: int = 0
+            for bar in preset['ActionBars']:
+                if bar['Loot'] == 'leaderboard_currency':
+                    leaderboard_loot = bar['LootCount']
+                    break
+            
+            leaderboard_hits: int = preset['ActionHitsNum']
+            leaderboard_crit_chance: float = preset['ActionCritChance']
+            leaderboard_crit_multiplier: float = preset['ActionCritMultiplier']
+
+            average_crits = leaderboard_hits * leaderboard_crit_chance
+
+            min_score = leaderboard_loot * leaderboard_hits
+            average_score = round((
+                leaderboard_loot * (leaderboard_hits - average_crits)
+            ) + (
+                leaderboard_loot * leaderboard_crit_multiplier * average_crits
+            ))
+
+            if base_points is None:
+                base_points = min_score
+
+
+            helper = MazeDataTypes.MazeCommHelper(
+                id = comm_helper['BossId'],
+                pony = boss['BossPony']['Pony'],
+                cooldown = comm_helper['Cooldown'],
+                skip = comm_helper['SkipCost'],
+                points = [min_score, average_score],
+                multiplier = min_score // base_points,
+            )
+
+            self.game_data.maze_data.community.helpers.append(helper)
     
     def get_quest_data(self):
         quest_data = self.game_data.quest_data
