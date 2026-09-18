@@ -19,7 +19,7 @@ from luna_kit.typings import DLCManifest
 
 from .data_types import GameData
 from .data_types.GameDataTypes import GameVersion
-from .app_info import get_app_info
+from .app_info import StoreManager
 from .console import console
 from .crop import crop_image
 from .downloader import download
@@ -88,7 +88,13 @@ def build_cdn(
                     console.print('Could not get current version')
         
         console.print('getting app info')
-        app_info = get_app_info(bucket = PRIVATE_BUCKET)
+
+        store_manager = StoreManager(
+            public_bucket = BUCKET,
+            secret_bucket = PRIVATE_BUCKET,
+        )
+        
+        app_info = store_manager.get_app_info()
         console.print('got app info')
         if version == 'latest':
             latest_version = app_info.version
