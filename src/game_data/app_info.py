@@ -3,6 +3,8 @@ from dataclasses import dataclass
 import html
 import json
 import os
+from pathlib import Path
+import tempfile
 import time
 from typing import TYPE_CHECKING
 
@@ -11,10 +13,14 @@ from playstoreapi.config import config, getDevicesCodenames, getDevicesReadableN
 from playstoreapi.googleplay import GooglePlayAPI, LoginError
 import requests
 
-from luna_kit.api import Version
+from game_data.data_types.GPlayTypes import GPlayAPKDetails
+from luna_kit.api import Downloader, Version
+from luna_kit.file_utils import PathOrBinaryFile
+from luna_kit.find_ark_key import find_aes_key
 
 from .console import console
-from .s3 import get_secret_s3_client, get_s3_client
+from .data_types.GPlayTypes import GPlayAPKDetails, GPlayFile
+from .s3 import get_s3_client, get_secret_s3_client
 from .utils import json_dumps_compact
 
 if TYPE_CHECKING:
@@ -26,6 +32,9 @@ if TYPE_CHECKING:
 PACKAGE_NAME = "com.gameloft.android.ANMP.GloftPOHM"
 GPLAY_CONFIG_PATH = '.playstoreapi'
 GPLAY_CONFIG_KEY = 'gplay/gplay_config.json'
+LUNA_KIT_ARK_KEYS_KEY = 'luna_kit/ark_keys.json'
+
+
 
 def unescape_text(s: str):
     return html.unescape(s.replace("<br>", "\n"))
@@ -169,7 +178,7 @@ class StoreManager:
                 ContentType = 'application/json',
             )
         else:
-            console.print('Cannot save gplay config to s3', s3_client, bucket)
+            console.print('Cannot save gplay config to s3', self.secret_s3, self.secret_bucket)
         
         return api
 
@@ -240,3 +249,100 @@ class StoreManager:
             key = lambda details: Version.parse(details.version),
             reverse = True,
         )[0]
+
+    # apk stuff
+
+    def download_apk(self, file: GPlayFile, output: PathOrBinaryFile):
+        response = requests.get(file['url'], cookies = file['cookies'], headers = {}, stream = True)
+        downloader = Downloader(response, output)
+        return downloader.full_download(console = console)
+    
+    def get_apk_details(self, version_code: int | None = None) -> GPlayAPKDetails:
+        if self.api is None:
+            raise ValueError('Not logged in')
+        
+        details: GPlayAPKDetails = self.api.download(self.package_name, versionCode = version_code) # type: ignore
+        return details
+    
+    def find_lib_apk(self, apk_details: GPlayAPKDetails):
+        ARCHITECTURES = [
+            "arm64_v8a",
+            "armeabi_v7a",
+            "x86",
+            "x86_64",
+        ]
+
+        lib_file: GPlayFile | None = None
+        used_arch: str | None = None
+        
+        for split in apk_details['splits']:
+            name = split['name']
+            arch = name.removeprefix('config.')
+
+            if arch not in ARCHITECTURES:
+                continue
+
+            if used_arch is None or ARCHITECTURES.index(arch) < ARCHITECTURES.index(used_arch):
+                used_arch = arch
+                lib_file = split['file']
+        
+        return lib_file
+
+    def get_aes_key(self, apk_file: PathOrBinaryFile, version: Version):
+        try:
+            key = find_aes_key(apk_file)
+        except Exception as e:
+            console.print_exception()
+            return
+        
+        if self.public_s3 is not None and self.public_bucket:
+            ark_keys: dict[str, str] = {}
+            try:
+                ark_keys = json.load(self.public_s3.get_object(
+                    Bucket = self.public_bucket,
+                    Key = LUNA_KIT_ARK_KEYS_KEY,
+                )['Body'])
+            except Exception as e:
+                e.add_note('Failed to get aes keys')
+                console.print_exception()
+            
+            key_hex = key.hex()
+            if key_hex not in list(ark_keys.values()):
+                ark_keys[str(version)] = key_hex
+
+                try:
+                    self.public_s3.put_object(
+                        Bucket = self.public_bucket,
+                        Key = LUNA_KIT_ARK_KEYS_KEY,
+                        Body = json.dumps(ark_keys, indent = 2, ensure_ascii = False).encode('utf-8'),
+                        ContentType = 'application/json',
+                    )
+                except Exception as e:
+                    e.add_note('Failed to upload keys')
+                    console.print_exception()
+
+        return key
+    
+    def fetch_aes_key(self, version: Version) -> bytes | None:
+        """
+        Downloads lib apk, extracts aes key, and uploads key to rucket
+
+        Args:
+            version (Version): Version this is for
+        """
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            dirpath = Path(tempdir)
+            apk_path = dirpath/'app.apk'
+
+            console.print('Fetching apk details')
+            details = self.get_apk_details()
+            lib_info = self.find_lib_apk(details)
+            if lib_info is None:
+                console.print('[red]Could not find lib apk, trying main apk[/]')
+                lib_info = details['file']
+
+            console.print('Downloading apk')
+            self.download_apk(lib_info, apk_path)
+            
+            return self.get_aes_key(apk_path, version)
