@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Get and upload the game data to All The Ponies"
 readme = "README.md"
 authors = [
-    { name = "ego-lay_atman-bay", email = "ego-lay-atman-bay@gmail.com" }
+    { name = "ego-lay_atman-bay", email = "egolayatmanbay@gmail.com" }
 ]
 requires-python = ">=3.14"
 dependencies = [
@@ -44,4 +44,4 @@ dev = [
     "python-dotenv>=1.2.2",
     "types-boto3-custom",
     "types-lxml>=2026.2.16",
-]
+] 
