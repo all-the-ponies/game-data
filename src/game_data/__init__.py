@@ -65,6 +65,8 @@ def build_cdn(
 
     success: bool = True
 
+    aes_key: bytes | None = None
+
     if BUCKET and s3_client and (version == 'latest' or force):
         last_version: GameVersion | None = None
         try:
@@ -125,7 +127,13 @@ def build_cdn(
                     ContentType = 'application/json',
                 )
             except:
-                console.print('[red]Failed to save dlc_manifest[/]')
+                console.print('[red]Failed to save version[/]')
+
+            try:
+                aes_key = store_manager.fetch_aes_key(Version.parse(latest_version))
+            except:
+                console.print('[red]Could not get aes key[/]')
+            
         elif Version.parse(latest_version) < Version.parse(last_version.game_version):
             console.print('[green]All up to date![/]')
             return True
@@ -177,7 +185,7 @@ def build_cdn(
     if 'extract' not in skip:
         console.print('Extracting files')
         try:
-            extract(arks_dir, extracted_dir)
+            extract(arks_dir, extracted_dir, aes_key = aes_key)
         except:
             console.print_exception()
             console.print('[red]Failed to extract files[/]')

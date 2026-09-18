@@ -9,7 +9,7 @@ from rich.progress import Progress, TextColumn, BarColumn, MofNCompleteColumn, T
 from glob import glob
 from pathlib import Path
 
-def extract(arks_dir: Path, output: Path):
+def extract(arks_dir: Path, output: Path, aes_key: bytes | None = None):
     arks_dir = Path(arks_dir)
     output = Path(output)
 
@@ -20,7 +20,7 @@ def extract(arks_dir: Path, output: Path):
         console.print('[red]Could not sort ark files[/]')
 
     for filename in arks:
-        with ARK(arks_dir/filename) as ark:
+        with ARK(arks_dir/filename, aes_key = aes_key) as ark:
             console.print(f'Extracting [yellow]{filename}[/]')
 
             for filename in track(
