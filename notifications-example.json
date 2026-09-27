@@ -3,27 +3,63 @@
     {
       "name": "All The Ponies",
       "webhook": "DISCORD_WEBHOOK",
+      "user": {
+        "username": "All The Ponies",
+        "avatar": "https://all-the-ponies.com/favicon/favicon.png"
+      },
       "message": {
         "app": {
-          "roles": [
-            "1514488029891264542"
-          ],
-          "title": "New game version available!",
-          "message": "My Little Pony: Magic Princess has a new app update!\n\n**Version:** {version}",
-          "fields": [
+          "content": "<@&123456789> new content",
+          "embeds": [
             {
-              "name": "What's New",
-              "value": "{release_notes}",
-              "inline": false
+              "title": "New game version available!",
+              "description": "My Little Pony: Magic Princess has a new app update!\n\n**Version:** {version}",
+              "color": 16739227,
+              "thumbnail": {
+                  "url": "{app_icon}"
+              },
+              "fields": [
+                {
+                  "name": "What's New",
+                  "value": "{release_notes}",
+                  "inline": false
+                }
+              ]
+            }
+          ],
+          "components": [
+            {
+              "type": 1,
+              "components": [
+                {
+                  "type": 2,
+                  "style": 5,
+                  "label": "Google Play",
+                  "url": "https://play.google.com/store/apps/details?id=com.gameloft.android.ANMP.GloftPOHM"
+                },
+                {
+                  "type": 2,
+                  "style": 5,
+                  "label": "iOS App Store",
+                  "url": "https://apps.apple.com/us/app/my-little-pony-magic-princess/id533173905"
+                }
+              ]
             }
           ]
         },
         "content": {
-          "roles": [
-            "1514488029891264542"
-          ],
-          "title": "New content update available!",
-          "message": "My Little Pony: Magic Princess has a new content update! Open the game to download it."
+          "content": "<@&1514742053278449834>",
+          "embeds": [
+            {
+              "title": "New content update available!",
+              "description": "My Little Pony: Magic Princess has a new content update! Open the game to download it.",
+              "color": 16739227,
+              "thumbnail": {
+                  "url": "{app_icon}"
+              },
+              "fields": []
+            }
+          ]
         }
       }
     }

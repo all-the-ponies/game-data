@@ -44,6 +44,7 @@ class Notifier:
             return string.format(
                 version = self.version,
                 release_notes = self.release_notes,
+                app_icon = self.app_icon,
             ) # type: ignore
         elif isinstance(string, dict):
             new = {}
@@ -118,56 +119,20 @@ class Notifier:
             console.print(f'Notifying [yellow]{server['name']}[/]')
 
             body = {
-                "username": "All The Ponies",
-                'content': ' '.join(f'<@&{role}>' for role in message_config['roles']),
-                "avatar_url": "https://all-the-ponies.com/favicon/favicon.png",
+                "username": self.format_string(server['user']['username']),
+                'content': self.format_string(message_config['content']),
+                "avatar_url": self.format_string(server['user']['avatar']),
                 "allowed_mentions": {
                     "parse": ["roles"],
                     "roles": []
                 },
             }
 
-            embed = {
-                'title': self.format_string(message_config['title']),
-                'description': self.format_string(message_config['message']),
-                "color": 16739227,
-                "thumbnail": {
-                    "url": self.app_icon,
-                },
-                "fields": [],
-            }
-
-            for field in message_config.get("fields", []):
-                embed['fields'].append({
-                    'name': self.format_string(field.get('name')),
-                    'value': self.format_string(field.get('value')),
-                    'inline': field.get('inline'),
-                })
+            for embed in message_config.get('embeds', []):
+                body.setdefault('embeds', []).append(self.format_string(dict(embed)))
             
-            body['embeds'] = [embed]
-
-            if type == 'app':
-                body['components'] = [
-                    {
-                        "type": 1,
-                        "components": [
-                            {
-                                "type": 2,
-                                "style": 5,
-                                "label": "Google Play",
-                                "url": "https://play.google.com/store/apps/details?id=com.gameloft.android.ANMP.GloftPOHM",
-                                # "custom_id": str(uuid.uuid4()),
-                            },
-                            {
-                                "type": 2,
-                                "style": 5,
-                                "label": "iOS App Store",
-                                "url": "https://apps.apple.com/us/app/my-little-pony-magic-princess/id533173905",
-                                # "custom_id": str(uuid.uuid4()),
-                            }
-                        ]
-                    }
-                ]
+            for component in message_config.get('components', []):
+                body.setdefault('components', []).append(self.format_string(dict(component)))
             
             failed = False
             try:
@@ -179,3 +144,5 @@ class Notifier:
             
             if failed:
                 console.print(f'[red]Failed to send to {server['name']}[/]')
+            
+            
