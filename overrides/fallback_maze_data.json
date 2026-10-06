@@ -97,7 +97,7 @@
         {
           "currency": 14,
           "price": 15000,
-          "id": "MazePony_Appledrac"
+          "id": "MazePony_Twist_The_Reindeer"
         }
       ],
       "Slot0": [
@@ -149,7 +149,7 @@
       "Slot0": [
         {
           "currency": 14,
-          "price": 8600,
+          "price": 7800,
           "id": "MazePony_Coco_Crusoe"
         }
       ],
@@ -166,13 +166,13 @@
         {
           "currency": 14,
           "price": 16500,
-          "id": "MazePony_Madden"
+          "id": "MazePony_Ginger_Gold"
         }
       ],
       "Slot0": [
         {
           "currency": 14,
-          "price": 7700,
+          "price": 6200,
           "id": "MazePony_Apple_Stars"
         }
       ],
@@ -180,7 +180,7 @@
         {
           "currency": 14,
           "price": 18000,
-          "id": "MazePony_Mean_Fluttershy"
+          "id": "MazePony_Stylish_Reindeer"
         }
       ]
     },
@@ -218,8 +218,8 @@
       "Slot0": [
         {
           "currency": 14,
-          "price": 10000,
-          "id": "MazePony_Future_Big_Mac"
+          "price": 9300,
+          "id": "MazePony_Lil_Scootaloo"
         }
       ],
       "Slot2": [
@@ -339,7 +339,7 @@
       },
       {
         "max": 1,
-        "id": "MazePony_Tempest_Shadow",
+        "id": "MazePony_Oriental_Zecora",
         "weight": 10,
         "min": 1
       },
@@ -393,7 +393,7 @@
       },
       {
         "max": 1,
-        "id": "MazePony_Mean_Applejack",
+        "id": "MazePony_Western_Pinkie_Pie",
         "weight": 10,
         "min": 1
       },
@@ -461,7 +461,7 @@
       },
       {
         "max": 1,
-        "id": "MazePony_Apple_Pinkie_Pie",
+        "id": "MazePony_Cozy_Glow",
         "weight": 10,
         "min": 1
       },
@@ -491,7 +491,7 @@
       },
       {
         "max": 1,
-        "id": "MazePony_Umbra",
+        "id": "MazePony_Pirate_Applejack",
         "weight": 10,
         "min": 1
       },
@@ -575,7 +575,7 @@
       },
       {
         "max": 1,
-        "id": "MazePony_Lemony_Gem",
+        "id": "MazePony_Prince_Hisan",
         "weight": 10,
         "min": 1
       },
@@ -593,7 +593,7 @@
       },
       {
         "max": 1,
-        "id": "MazePony_Chrysalis",
+        "id": "MazePony_Breezie_Trixie",
         "weight": 10,
         "min": 1
       },
@@ -709,7 +709,7 @@
       },
       {
         "max": 1,
-        "id": "MazePony_Diamante_Elegante",
+        "id": "MazePony_Cider_Hall_Regular",
         "weight": 10,
         "min": 1
       },
@@ -819,7 +819,7 @@
       },
       {
         "max": 1,
-        "id": "MazePony_Future_Pumpkin_Cake",
+        "id": "MazePony_Nightmare_Night_Golden_Harvest",
         "weight": 10,
         "min": 1
       },
