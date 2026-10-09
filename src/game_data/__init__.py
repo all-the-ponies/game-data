@@ -67,7 +67,7 @@ def build_cdn(
 
     aes_key: bytes | None = None
 
-    if BUCKET and s3_client and (version == 'latest' or force):
+    if BUCKET and s3_client:
         last_version: GameVersion | None = None
         try:
             version_file = s3_client.get_object(
@@ -89,79 +89,87 @@ def build_cdn(
                 except:
                     console.print('Could not get current version')
         
-        console.print('getting app info')
+        if  version == 'latest' or force:
+            console.print('getting app info')
 
-        store_manager = StoreManager(
-            public_bucket = BUCKET,
-            secret_bucket = PRIVATE_BUCKET,
-        )
-        
-        app_info = store_manager.get_app_info()
-        console.print('got app info')
-        if version == 'latest':
-            latest_version = app_info.version
-        else:
-            latest_version = version
-
-        notifier.version = latest_version
-        notifier.release_notes = app_info.release_notes
-        notifier.app_icon = app_info.icon_url
-
-        version = latest_version
-        if not last_version or Version.parse(latest_version) > Version.parse(last_version.game_version):
-            console.print(f'New app version found: [yellow]{latest_version}[/]')
-            notifier.notify('app')
-
-            if last_version:
-                last_version.game_version = latest_version
+            store_manager = StoreManager(
+                public_bucket = BUCKET,
+                secret_bucket = PRIVATE_BUCKET,
+            )
+            
+            app_info = store_manager.get_app_info()
+            console.print('got app info')
+            if version == 'latest':
+                latest_version = app_info.version
             else:
-                last_version = GameVersion(
-                    game_version = latest_version
-                )
+                latest_version = version
 
-            try:
-                s3_client.put_object(
-                    Bucket = BUCKET,
-                    Key = 'game_version_checker/game_version.json',
-                    Body = last_version.model_dump_json().encode('utf-8'),
-                    ContentType = 'application/json',
-                )
-            except:
-                console.print('[red]Failed to save version[/]')
+            notifier.version = latest_version
+            notifier.release_notes = app_info.release_notes
+            notifier.app_icon = app_info.icon_url
 
-            try:
-                aes_key = store_manager.fetch_aes_key(Version.parse(latest_version))
-            except:
-                console.print('[red]Could not get aes key[/]')
-            
-        elif Version.parse(latest_version) < Version.parse(last_version.game_version):
-            console.print('[green]All up to date![/]')
-            return True
-        else:
-            api = API('android', last_version.game_version)
+            version = latest_version
+            if not last_version or Version.parse(latest_version) > Version.parse(last_version.game_version):
+                console.print(f'New app version found: [yellow]{latest_version}[/]')
+                notifier.notify('app')
 
-            try:
-                last_dlc_manifest_file = s3_client.get_object(
-                    Bucket = BUCKET,
-                    Key = 'game_version_checker/current_dlc_manifest.json',
-                )
-                last_dlc_manifest = json.load(last_dlc_manifest_file['Body'])
-
-                api = API('android', latest_version)
-                latest_dlc_manifest = api.get_dlc_manifest()
-
-                if last_dlc_manifest == latest_dlc_manifest:
-                    console.print('[green]All up to date![/]')
-                    return True
+                if last_version:
+                    last_version.game_version = latest_version
                 else:
-                    console.print('New content update found!')
-                    notifier.notify('content')
+                    last_version = GameVersion(
+                        game_version = latest_version
+                    )
 
-            except ClientError:
-                console.print('Could not check dlc_manifest')
-                notifier.notify('content')
-            
-        console.print(f'[green]Found version {version}[/]')
+                try:
+                    s3_client.put_object(
+                        Bucket = BUCKET,
+                        Key = 'game_version_checker/game_version.json',
+                        Body = last_version.model_dump_json().encode('utf-8'),
+                        ContentType = 'application/json',
+                    )
+                except:
+                    console.print('[red]Failed to save version[/]')
+
+                try:
+                    aes_key = store_manager.fetch_aes_key(Version.parse(latest_version))
+                except:
+                    console.print('[red]Could not get aes key[/]')
+                
+            elif Version.parse(latest_version) < Version.parse(last_version.game_version):
+                console.print('[green]All up to date![/]')
+                return True
+            else:
+                api = API('android', last_version.game_version)
+
+                try:
+                    last_dlc_manifest_file = s3_client.get_object(
+                        Bucket = BUCKET,
+                        Key = 'game_version_checker/current_dlc_manifest.json',
+                    )
+                    last_dlc_manifest = json.load(last_dlc_manifest_file['Body'])
+
+                    api = API('android', latest_version)
+                    latest_dlc_manifest = api.get_dlc_manifest()
+
+                    if last_dlc_manifest == latest_dlc_manifest:
+                        console.print('[green]All up to date![/]')
+                        return True
+                    else:
+                        console.print('New content update found!')
+                        notifier.notify('content')
+
+                except ClientError:
+                    console.print('Could not check dlc_manifest')
+                    notifier.notify('content')
+                
+            console.print(f'[green]Found version {version}[/]')
+        else:
+            if last_version and Version.parse(version) < Version.parse(last_version.game_version):
+                console.print(f'[red]Selected version {version} is lower than last version {last_version.game_version}[/]')
+                if console.input(f'Continue (y/N)? ').strip() in ['', 'n', 'no', 'f', 'false']:
+                    console.print('Quitting')
+                    return
+                console.print(f'Fetching version: {version}')
 
     else:
         console.print(f'version: {version}')
