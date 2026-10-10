@@ -239,7 +239,7 @@ class StoreManager:
             futures = [
                 threader.submit(self.get_gplay_api_details),
                 threader.submit(self.get_gplay_scrape_details),
-                threader.submit(self.get_apkmirror_details),
+                # threader.submit(self.get_apkmirror_details),
             ]
 
             infos = filter(lambda details: details is not None, [future.result() for future in futures])
