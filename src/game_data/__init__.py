@@ -15,6 +15,7 @@ import argcomplete
 from botocore.exceptions import ClientError
 
 from luna_kit.api import API, Version
+from luna_kit.gameobjectdata import GameObjectData
 from luna_kit.typings import DLCManifest
 
 from .data_types import GameData
@@ -26,6 +27,8 @@ from .downloader import download
 from .env import GAME_DATA_ENV_VAR, is_dev, load_env, set_mode
 from .extractor import extract
 from .image_gen import generate_images
+from .model_gen import generate_models
+from .model_gen.converter.animation_cache import AnimationCache
 from .notify import Notifier
 from .s3 import DEFAULT_BUCKET, get_s3_client
 from .sync import sync, upload_file
@@ -80,7 +83,7 @@ def build_cdn(
     skip: list[str] | None = None,
     ffdec: str = 'ffdec',
     force: bool = False,
-):
+) -> bool | None:
     BUCKET = os.environ.get('S3_BUCKET')
     PRIVATE_BUCKET = os.environ.get('PRIVATE_S3_BUCKET')
 
@@ -103,6 +106,8 @@ def build_cdn(
     notifier = Notifier()
 
     success: bool = True
+    failed_rkms = set()
+    model_cache = None
 
     aes_key: bytes | None = None
 
@@ -261,11 +266,16 @@ def build_cdn(
     if 'extract' not in skip:
         console.print('Extracting files')
         try:
-            extract(arks_dir, extracted_dir, aes_key = aes_key)
+            failed_rkms = extract(arks_dir, extracted_dir, aes_key = aes_key)
         except:
             console.print_exception()
             console.print('[red]Failed to extract files[/]')
             success = False
+            if 'model_gen' not in skip:
+                return False
+        else:
+            if failed_rkms and 'model_gen' not in skip:
+                console.print('[yellow]RKM extraction failed; affected 3D models will be excluded[/]')
 
         console.line()
 
@@ -290,6 +300,34 @@ def build_cdn(
         else:
             game_data = GameData.load(dist_dir)
 
+        if game_data and 'model_gen' not in skip:
+            console.print('Generating supported 3D models and animations')
+            if 'transform' not in skip:
+                native_objects = transformer.gameObjectData
+                campaign = transformer.defaultGameCampaign
+            else:
+                native_objects = GameObjectData(
+                    extracted_dir/'gameobjectdata.xml',
+                    extracted_dir/'shopdata.xml',
+                    extracted_dir/'gameobjectcategorydata.xml',
+                )
+                with (extracted_dir/'defaultGameCampaign.json').open(encoding='utf-8') as file:
+                    campaign = json.load(file)
+            public_identities = {
+                identity
+                for name in ('pony', 'pet', 'costume')
+                for identity in getattr(game_data.game_objects, name).objects
+            }
+            model_cache = AnimationCache(raw_dir/'model-cache/animations')
+            if s3_client and BUCKET:
+                model_cache.load_remote(s3_client, BUCKET)
+            report = generate_models(
+                native_objects, extracted_dir, dist_dir, raw_dir/'model-associations.json',
+                campaign=campaign, public_identities=public_identities,
+                failed_rkms=failed_rkms, animation_cache=model_cache,
+            )
+            console.print(report['summary'])
+
         if game_data and 'image_gen' not in skip:
             console.print('Generating images')
             generate_images(game_data, dist_dir)
@@ -300,6 +338,9 @@ def build_cdn(
                 dist_folder = dist_dir,
                 bucket = BUCKET,
             )
+
+            if model_cache is not None:
+                model_cache.publish_remote(dist_dir/'models_3d.json')
 
             s3_client.copy_object(
                 Bucket = BUCKET,
@@ -383,7 +424,7 @@ def create_argparser():
         '--skip',
         dest = 'skip',
         nargs = '+',
-        choices = ['download', 'extract', 'transform', 'image_gen'],
+        choices = ['download', 'extract', 'transform', 'model_gen', 'image_gen'],
         help = 'Skip action',
         default = [],
     )
